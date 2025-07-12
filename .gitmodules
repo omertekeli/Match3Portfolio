@@ -1,0 +1,3 @@
+[submodule "Assets/UnityCoreModules"]
+	path = Assets/UnityCoreModules
+	url = https://github.com/omertekeli/UnityCoreModules.git
