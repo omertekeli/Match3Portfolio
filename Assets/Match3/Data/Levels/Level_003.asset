@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b308b17726b94c24850c711ac02f93db, type: 3}
-  m_Name: Level_001
+  m_Name: Level_003
   m_EditorClassIdentifier: 
-  _levelNumber: 1
-  _maxMove: 20
+  _levelNumber: 3
+  _maxMove: 10
   _lowMoveTrigger: 3
   _borderMargin: 0.3
   _backgroundSprite: {fileID: 0}

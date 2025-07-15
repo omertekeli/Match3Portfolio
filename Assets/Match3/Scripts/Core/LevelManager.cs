@@ -1,15 +1,17 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Match3.Scripts.LevelSystem.Data;
+using Match3.Scripts.LevelSystem.Goals;
 
-namespace Match3.Scripts.LevelSystem.Runtime
+namespace Match3.Scripts.Core
 {
-    public class LevelManager: MonoBehaviour
+    public class LevelManager: MonoBehaviour, IService
     {
         #region Fields
-    
-        [SerializeField] private LevelDataSO levelData;
-        
+
+        private List<LevelGoalBase> _levelGoals;
+
         #endregion
         
         #region Properties
@@ -23,20 +25,16 @@ namespace Match3.Scripts.LevelSystem.Runtime
         public event Action OnAllGoalCompleted;
         
         #endregion
-
+        
         private void Awake()
         {
-            //ServiceLocator.Register(this, replaceIfExists:true);
+            DontDestroyOnLoad(gameObject);
         }
 
-        private void OnDestroy()
-        {
-            //ServiceLocator.Unregister<LevelManager>();
-        }
-        
-        private void Initialize()
+        public void PrepareLevel(LevelDataSO levelData)
         {
             RemaningMove = levelData.MaxMove;
+            _levelGoals = levelData.CreateRuntimeGoals();
         }
     }
 }

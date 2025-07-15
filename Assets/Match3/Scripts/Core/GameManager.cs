@@ -1,27 +1,55 @@
+using Match3.Scripts.Enums;
 using Match3.Scripts.LevelSystem.Data;
-using Match3.Scripts.LevelSystem.Runtime;
+using UnityCoreModules.Services;
 using UnityEngine;
 
 namespace Match3.Scripts.Core
 {
-    public class GameManager: MonoBehaviour
+    public class GameManager: MonoBehaviour, IService
     {
         #region Fields
 
         [SerializeField] private LevelListSO _levelList;
+        [SerializeField] private LevelDataSO[] _levelDatas;
+
+        private GameState _gameCurrentState;
     
+        #endregion
+        
+        #region Properties
+        
+        public GameState GameState { get; private set; }
+        
         #endregion
         private void Awake()
         {
             Application.targetFrameRate = 30;
-            DontDestroyOnLoad(this);
+            SetState(GameState.MainMenu);
+            DontDestroyOnLoad(gameObject);
         }
-
+        
+        public void StartLevel(int levelNumber)
+        {
+            Debug.Log($"Starting level {levelNumber}");
+            SetState(GameState.Gameplay);
+            var levelData = _levelDatas[levelNumber];
+            ServiceLocator.Get<LevelManager>().PrepareLevel(levelData);
+            ServiceLocator.Get<UIManager>().PrepareLevel(levelData);
+        }
+        
         public void LoadLevel(int levelNumber)
         {   
             Debug.Log($"Selected level {levelNumber + 1}");
-            LevelLoader.Load(_levelList, levelNumber);
+            SetState(GameState.Loading);
+            ServiceLocator.Get<SceneLoader>().LoadLevel(_levelList, levelNumber);
         }
+
+        private void SetState(GameState state)
+        {
+            _gameCurrentState = state;
+        }
+        
+        
         
            
     }
