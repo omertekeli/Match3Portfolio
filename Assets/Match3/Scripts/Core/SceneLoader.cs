@@ -95,7 +95,7 @@ namespace Match3.Scripts.Core
                 Debug.LogWarning("Could not extract level number from scene name.");
                 return;
             }
-            ServiceLocator.Get<GameManager>().StartLevel(levelNumber);
+            _ = ServiceLocator.Get<GameManager>().StartLevelAsync(levelNumber);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Match3.Scripts.Enums;
 using Match3.Scripts.LevelSystem.Data;
 using UnityCoreModules.Services;
@@ -28,7 +29,7 @@ namespace Match3.Scripts.Core
             DontDestroyOnLoad(gameObject);
         }
         
-        public void StartLevel(int levelNumber)
+        public async Task StartLevelAsync(int levelNumber)
         {
             Debug.Log($"Starting level {levelNumber}");
             SetState(GameState.Gameplay);
@@ -37,10 +38,11 @@ namespace Match3.Scripts.Core
             ServiceLocator.Get<UIManager>().PrepareLevel(levelData);
         }
         
-        public void LoadLevel(int levelNumber)
+        public async Task LoadLevelAsync(int levelNumber)
         {   
             Debug.Log($"Selected level {levelNumber + 1}");
             SetState(GameState.Loading);
+            await ServiceLocator.Get<UIManager>().FadeInAsync();
             ServiceLocator.Get<SceneLoader>().LoadLevel(_levelList, levelNumber);
         }
 
@@ -48,9 +50,5 @@ namespace Match3.Scripts.Core
         {
             _gameCurrentState = state;
         }
-        
-        
-        
-           
     }
 }

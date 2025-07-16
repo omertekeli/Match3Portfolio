@@ -16,7 +16,7 @@ namespace Match3.Scripts.UI
                 var levelIndex = i;
                _levelButtons[i].onClick.AddListener(() =>
                {
-                   ServiceLocator.Get<GameManager>().LoadLevel(levelIndex);
+                   _ = ServiceLocator.Get<GameManager>().LoadLevelAsync(levelIndex);
                });
             }
         }
