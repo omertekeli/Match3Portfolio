@@ -1,28 +1,33 @@
 using System;
 using Match3.Scripts.Enums;
+using Match3.Scripts.LevelSystem.Data;
 
 namespace Match3.Scripts.LevelSystem.Goals
 {
     public class GemMatchGoal: LevelGoalBase
     {
-        private GemType _gemType;
-        private int _targetCount;
-        private int _currentCount = 0;
+        #region Properties
+        public GemType GoalGemType { get; private set; }
+        public int TargetCount { get; private set; }
+        public int CurrentCount{ get; private set; }
+        
+        #endregion
+
         
         public event Action<int, int> OnProgressUpdated;
                 
-        public GemMatchGoal(GemType gemType, int targetCount)
+        public GemMatchGoal(GemGoalData goalData)
         {
-            _gemType = gemType;
-            _targetCount = targetCount;
+            GoalGemType = goalData.GoalGemType;
+            TargetCount = goalData.TargetCount;
         }
         
         public void TryToMatch(GemType gemType)
         {
-            if (IsCompleted || gemType != _gemType) return;
-            _currentCount++;
-            OnProgressUpdated?.Invoke(_currentCount, _targetCount);
-            if (_currentCount >= _targetCount)
+            if (IsCompleted || gemType != GoalGemType) return;
+            CurrentCount++;
+            OnProgressUpdated?.Invoke(CurrentCount, TargetCount);
+            if (CurrentCount >= TargetCount)
             {
                 base.CompleteGoal();
             }
