@@ -24,51 +24,6 @@ The project’s goal is to demonstrate modern Unity development practices, modul
 - Basic sound effects and UI animations.
 - Clean and readable codebase, commented and ready for further extension.
 
-## 🏗️ Architecture & Patterns Used
-
-**This project was built using modern, professional architecture principles:**
-
-### 1. ScriptableObject Pattern
-- All tile types and level configs are defined as ScriptableObjects.
-- Allows content to be created and balanced directly in the Unity Editor, supporting data-driven design.
-
-### 2. State Machine
-- Central `GameManager` maintains the game flow using simple state management (`Idle`, `PlayerInput`, `Animating`, `GameOver`).
-- Reduces complexity in the main game loop.
-
-### 3. Event-Driven (Observer/Event Bus)
-- Decoupled communication between game systems (BoardManager, UI, Score, Audio).
-- Makes the code modular, testable, and easy to expand.
-
-### 4. Service Locator
-- AudioManager, FirebaseService, and other managers are accessible via a loose-coupling service locator.
-- Enhances testability and supports dependency injection for future features.
-
-### 5. MVC-Inspired UI Layering
-- UI logic, game logic, and data are separated for maintainability and clean code.
-
-### 6. Asset Management
-- Organized folders for scripts, prefabs, art, configs, UI, and addressables.
-- Designed with mobile optimization in mind (sprite atlas, batching).
-
----
-
-## 📐 Project Architecture Diagram
-
-```mermaid
-graph TD
-    GameManager --> BoardManager
-    BoardManager -->|uses| TileTypeSO
-    BoardManager -->|publishes| EventBus
-    EventBus --> UIManager
-    EventBus --> ScoreManager
-    EventBus --> AudioManager
-    EventBus --> FirebaseService
-    ServiceLocator -.-> AudioManager
-    ServiceLocator -.-> FirebaseService
-```
----
-
 ## ✨ Extensibility & Future Work
 - Special tiles (chained, frozen, locked, etc.)
 - Boosters (bomb, rocket, disco ball, etc.)
@@ -77,3 +32,19 @@ graph TD
 - Advanced visual effects (shader-based, addressables, etc.)
 
 **This project is published solely for demonstration and portfolio purposes.**
+
+## 📄 License
+
+This project is licensed under the **Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)**.
+
+You are free to:
+- View and learn from the code.
+
+You are **not allowed to**:
+- Modify the code.
+- Redistribute it.
+- Use it commercially.
+
+🔗 [Read the full license here.](https://creativecommons.org/licenses/by-nc-nd/4.0/)
+
+© 2025 Ömer Tekeli. All rights reserved.
