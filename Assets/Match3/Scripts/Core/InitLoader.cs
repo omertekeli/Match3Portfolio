@@ -18,9 +18,11 @@ namespace Match3.Scripts.Core
         private void TryToRegisterServices()
         {
             foreach (var mb in _services)
-            {
-                if (mb is not IService service) continue;
+            {   
+                Debug.Log($"Try to registering service for level {mb.gameObject.name}");
+                if (!mb || !mb.enabled || mb is not IService service) continue;
                 var type = service.GetType();
+                Debug.Log($"Registering service '{type.Name}'");
                 typeof(ServiceLocator)
                     .GetMethod("Register")
                     ?.MakeGenericMethod(type)

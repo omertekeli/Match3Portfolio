@@ -1,6 +1,9 @@
-using TMPro;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Match3.Scripts.Enums;
+using Match3.Scripts.LevelSystem.Data;
+using Match3.Scripts.LevelSystem.Goals;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Match3.Scripts.UI
 {
@@ -8,6 +11,7 @@ namespace Match3.Scripts.UI
     {
         #region Fields
         
+        [SerializeField] private GameObject _hud;
         [SerializeField] private GoalPanelUI _goalPanel;
         //[SerializeField] private MoveCounterUI _moveCounter;
         //[SerializeField] private ScoreUI _scoreUI;
@@ -16,6 +20,18 @@ namespace Match3.Scripts.UI
         //[SerializeField] private TextMeshProUGUI _scoreText;
         //[SerializeField] private Slider _progressBar;
         
-        #endregion       
+        #endregion
+
+        public void ToggleHUD(GameState state)
+        {
+            bool shouldShow = state != GameState.MainMenu && state != GameState.Loading;
+            Debug.Log($"ShouldShow HUD: {shouldShow}");
+            _hud.SetActive(shouldShow);
+        }
+        public void SetupUI(LevelDataSO leveldata, List<LevelGoalBase> goals)
+        {
+            _goalPanel.SetGoals(goals);
+        }
+        
     }
 }

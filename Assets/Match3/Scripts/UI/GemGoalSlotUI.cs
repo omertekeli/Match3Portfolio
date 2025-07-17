@@ -1,5 +1,7 @@
+using Match3.Scripts.Core;
 using Match3.Scripts.LevelSystem.Goals;
 using TMPro;
+using UnityCoreModules.Services;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,11 +14,10 @@ namespace Match3.Scripts.UI
         
         protected internal override void Set(LevelGoalBase goal)
         {
-            if (goal is GemMatchGoal gemMatchGoal)
-            {
-                //_icon.sprite = GemDataBase.GetSprite(gemMatchGoal.GoalGemType);
-                _targetCountText.text = gemMatchGoal.TargetCount.ToString();
-            }
+            if (goal is not GemMatchGoal gemMatchGoal) return;
+            Debug.Log($"Goal is set to {gemMatchGoal.TargetCount} for {gemMatchGoal.GoalGemType.ToString()}");
+            _icon.sprite = ServiceLocator.Get<GemSpriteProvider>().GetSprite(gemMatchGoal.GoalGemType);
+            _targetCountText.text = gemMatchGoal.TargetCount.ToString();
         }
     }
 }
