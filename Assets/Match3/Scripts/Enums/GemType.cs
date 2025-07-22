@@ -4,6 +4,13 @@ namespace Match3.Scripts.Enums
     {
         Blue,
         Red,
-        Green
+        Green,
+        Cream,
+        Yellow,
+        Crown,
+        LightBlue,
+        Orange,
+        Purple,
+        Pink
     }
 }

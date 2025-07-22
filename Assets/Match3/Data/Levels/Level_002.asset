@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Level_002
   m_EditorClassIdentifier: 
   _levelNumber: 2
-  _maxMove: 18
+  _maxMove: 15
   _lowMoveTrigger: 3
   _borderMargin: 0.3
   _backgroundSprite: {fileID: 0}

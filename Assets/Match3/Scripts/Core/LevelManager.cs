@@ -1,22 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using Match3.Scripts.LevelSystem.Data;
 using Match3.Scripts.LevelSystem.Goals;
+using NUnit.Framework;
+using UnityEditor;
 
 namespace Match3.Scripts.Core
 {
     public class LevelManager: MonoBehaviour, IService
     {
-        #region Fields
-
-        private List<LevelGoalBase> _levelGoals;
-
-        #endregion
-        
         #region Properties
         
         public int RemaningMove { get; private set; }
+        public List<LevelGoalBase> LevelGoals {get; private set;}
         
         #endregion
         
@@ -31,10 +29,11 @@ namespace Match3.Scripts.Core
             DontDestroyOnLoad(gameObject);
         }
 
-        public void PrepareLevel(LevelDataSO levelData)
+        public Task InitializeLevelAsync(LevelDataSO levelData)
         {
             RemaningMove = levelData.MaxMove;
-            _levelGoals = levelData.CreateRuntimeGoals();
+            LevelGoals = levelData.CreateRuntimeGoals();
+            return Task.CompletedTask;
         }
     }
 }

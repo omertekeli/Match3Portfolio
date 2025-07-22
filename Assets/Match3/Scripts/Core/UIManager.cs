@@ -1,26 +1,56 @@
 using System.Threading.Tasks;
+using Match3.Scripts.Enums;
 using Match3.Scripts.LevelSystem.Data;
-using Match3.Scripts.UI;
+using Match3.Scripts.UI.Controllers;
+using Match3.Scripts.UI.Views;
+using UnityCoreModules.Services;
 using UnityEngine;
 
 namespace Match3.Scripts.Core
 {
-    public class UIManager: MonoBehaviour, IService
+    public class UIManager : MonoBehaviour, IService
     {
-        [SerializeField] private FadeController _fadeController;
+        #region Fields
+
+        [SerializeField] private HUDView _hudView;
+        [SerializeField] private FadeView _fadeView;
+        
+        private HUDController _hudController;
+        private FadeController _fadeController;
+
+        #endregion
+
         private void Awake()
         {
+            _hudController = new HUDController(_hudView);
+            _fadeController = new FadeController(_fadeView);
             DontDestroyOnLoad(gameObject);
         }
 
-        public void PrepareLevel(LevelDataSO levelData)
+        private void OnEnable()
         {
-            //throw new System.NotImplementedException();
+            ServiceLocator.Get<GameManager>().GameStateChanged += OnGameStateChanged;
         }
 
-        public async Task FadeInAsync()
+        private void OnGameStateChanged(GameState gameState)
+        {   
+            _hudController.ToggleHUD(gameState);
+        }
+
+        public void SetupLevelUIAsync(LevelDataSO levelData)
         {
-            await _fadeController.FadeInAsync();
+            _hudController.SetupUI(levelData, ServiceLocator.Get<LevelManager>().LevelGoals);
+        }
+
+        public async Task ShowLevelUIAsync(float holdTime = 1f)
+        {
+            await Task.Delay((int)(holdTime * 1000));
+            await _fadeController.FadeToWhiteAsync();
+        }
+
+        public async Task PlayLoadingTransitionAsync()
+        {
+            await _fadeController.FadeToBlackAsync();
         }
     }
 }

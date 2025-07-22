@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03f6cb8fdd70419fb923267773f0bd17, type: 3}
   m_Name: GemGoal_Blue_5
   m_EditorClassIdentifier: 
-  _gemType: 0
-  _targetCount: 5
+  _goalData:
+    GoalGemType: 0
+    TargetCount: 5
