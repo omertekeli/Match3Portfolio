@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _goalData:
     GoalGemType: 0
-    TargetCount: 0
+    TargetCount: 5

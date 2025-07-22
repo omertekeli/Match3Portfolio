@@ -1,7 +1,8 @@
 using System.Threading.Tasks;
 using Match3.Scripts.Enums;
 using Match3.Scripts.LevelSystem.Data;
-using Match3.Scripts.UI;
+using Match3.Scripts.UI.Controllers;
+using Match3.Scripts.UI.Views;
 using UnityCoreModules.Services;
 using UnityEngine;
 
@@ -11,13 +12,18 @@ namespace Match3.Scripts.Core
     {
         #region Fields
 
-        [SerializeField] private FadeController _fadeController;
-        [SerializeField] private HUDController _hudController;
+        [SerializeField] private HUDView _hudView;
+        [SerializeField] private FadeView _fadeView;
+        
+        private HUDController _hudController;
+        private FadeController _fadeController;
 
         #endregion
-        
+
         private void Awake()
         {
+            _hudController = new HUDController(_hudView);
+            _fadeController = new FadeController(_fadeView);
             DontDestroyOnLoad(gameObject);
         }
 
@@ -39,13 +45,11 @@ namespace Match3.Scripts.Core
         public async Task ShowLevelUIAsync(float holdTime = 1f)
         {
             await Task.Delay((int)(holdTime * 1000));
-            await _fadeController.FadeToWhiteAsync(); 
-            _fadeController.ToggleFadeImage(false);
+            await _fadeController.FadeToWhiteAsync();
         }
 
         public async Task PlayLoadingTransitionAsync()
         {
-            _fadeController.ToggleFadeImage(true);
             await _fadeController.FadeToBlackAsync();
         }
     }

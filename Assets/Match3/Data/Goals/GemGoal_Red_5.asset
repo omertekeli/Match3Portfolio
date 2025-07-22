@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: GemGoal_Red_5
   m_EditorClassIdentifier: 
   _goalData:
-    GoalGemType: 0
-    TargetCount: 0
+    GoalGemType: 1
+    TargetCount: 5

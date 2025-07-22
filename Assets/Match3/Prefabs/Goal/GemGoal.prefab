@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 6267590363346916872}
   - component: {fileID: 507081506637115854}
   m_Layer: 5
-  m_Name: FruitGoal
+  m_Name: GemGoal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

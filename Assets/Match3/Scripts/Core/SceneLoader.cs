@@ -1,3 +1,4 @@
+using System;
 using Match3.Scripts.Enums;
 using Match3.Scripts.LevelSystem.Data;
 using UnityCoreModules.Services;
@@ -8,6 +9,7 @@ namespace Match3.Scripts.Core
 {
     public class SceneLoader : MonoBehaviour, IService
     {
+        public static event Action<int> LevelLoaded;
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
@@ -66,7 +68,8 @@ namespace Match3.Scripts.Core
         
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            Notify(scene);
+            Debug.Log($"Scene loaded: {scene.name}");
+            NotifyLevelLoadIfValid(scene);
         }
         
         private static int ExtractLevelNumberFromSceneName(string sceneName)
@@ -79,10 +82,17 @@ namespace Match3.Scripts.Core
             return -1;
         }
 
-        private void Notify(Scene scene)
+        private void NotifyLevelLoadIfValid(Scene scene)
         {
-            Debug.Log($"Scene loaded: {scene.name}");
-            int levelNumber = - 1; 
+            int levelNumber = GetlevelNumberFromScene(scene); 
+            if (levelNumber == -1) return;
+            var levelIndex = levelNumber - 1;
+            LevelLoaded?.Invoke(levelIndex);
+        }
+
+        private static int GetlevelNumberFromScene(Scene scene)
+        {
+            int levelNumber = -1;
 #if UNITY_EDITOR
             levelNumber = ExtractLevelNumberFromSceneName(scene.name);
 #else
@@ -90,12 +100,7 @@ namespace Match3.Scripts.Core
                 return;
             levelNumber = scene.buildIndex - 1;
 #endif
-            if (levelNumber == -1)
-            {
-                Debug.LogWarning("Could not extract level number from scene name.");
-                return;
-            }
-            _ = ServiceLocator.Get<GameManager>().StartLevelAsync(levelNumber);
+            return levelNumber;
         }
     }
 }
