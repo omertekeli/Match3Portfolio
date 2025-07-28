@@ -1,5 +1,3 @@
-using System;
-using System.ComponentModel.Design;
 using UnityEngine;
 
 namespace Match3.Scripts.UI.Base

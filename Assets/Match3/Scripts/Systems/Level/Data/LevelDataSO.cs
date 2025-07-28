@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using Match3.Scripts.Systems.Level.Base;
 using UnityEngine;
-using Match3.Scripts.LevelSystem.Goals;
 
-namespace Match3.Scripts.LevelSystem.Data
+namespace Match3.Scripts.Systems.Level.Data
 {   
     [CreateAssetMenu(menuName = "Match3/Level Data")]
     public class LevelDataSO: ScriptableObject

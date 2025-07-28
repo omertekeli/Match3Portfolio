@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using Match3.Scripts.LevelSystem.Data;
-using Match3.Scripts.LevelSystem.Goals;
-using NUnit.Framework;
-using UnityEditor;
+using Match3.Scripts.Systems.Level.Data;
+using Match3.Scripts.Systems.Level.Base;
+using Cysharp.Threading.Tasks;
 
 namespace Match3.Scripts.Core
 {
@@ -29,11 +27,11 @@ namespace Match3.Scripts.Core
             DontDestroyOnLoad(gameObject);
         }
 
-        public Task InitializeLevelAsync(LevelDataSO levelData)
+        public UniTask InitializeLevelAsync(LevelDataSO levelData)
         {
             RemaningMove = levelData.MaxMove;
             LevelGoals = levelData.CreateRuntimeGoals();
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
     }
 }

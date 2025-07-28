@@ -1,7 +1,5 @@
 using System;
-using Match3.Scripts.Enums;
-using Match3.Scripts.LevelSystem.Data;
-using UnityCoreModules.Services;
+using Match3.Scripts.Configs;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

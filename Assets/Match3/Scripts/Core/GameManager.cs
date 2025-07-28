@@ -1,6 +1,8 @@
 using System;
+using Cysharp.Threading.Tasks;
+using Match3.Scripts.Configs;
 using Match3.Scripts.Enums;
-using Match3.Scripts.LevelSystem.Data;
+using Match3.Scripts.Systems.Level.Data;
 using Match3.Scripts.UI;
 using UnityCoreModules.Services;
 using UnityEngine;
@@ -59,27 +61,27 @@ namespace Match3.Scripts.Core
         {
             Debug.Log($"Selected level {levelNumber + 1}");
             if (!_levelList.IsLevelValid(levelNumber)) return;
-            LoadLevelAsync(levelNumber);
+            LoadLevelAsync(levelNumber).Forget();
         }
 
         private void OnLevelLoaded(int levelNumber)
         {
             Debug.Log($"Loaded level {levelNumber}");
             if (!_levelDatas[levelNumber]) return;
-            StartLevelAsync(levelNumber);
+            StartLevelAsync(levelNumber).Forget();
         }
 
-        private async void StartLevelAsync(int levelNumber)
+        private async UniTaskVoid StartLevelAsync(int levelNumber)
         {
             Debug.Log($"Starting level {levelNumber}");
             var levelData = _levelDatas[levelNumber];
             await ServiceLocator.Get<LevelManager>().InitializeLevelAsync(levelData);
-            ServiceLocator.Get<UIManager>().SetupLevelUIAsync(levelData);
+            ServiceLocator.Get<UIManager>().SetupLevelUI(levelData);
             SetState(GameState.Gameplay);
             await ServiceLocator.Get<UIManager>().ShowLevelUIAsync(_levelLoadingHoldTime);
         }
 
-        private async void LoadLevelAsync(int levelNumber)
+        private async UniTaskVoid LoadLevelAsync(int levelNumber)
         {
             SetState(GameState.Loading);
             await ServiceLocator.Get<UIManager>().PlayLoadingTransitionAsync();

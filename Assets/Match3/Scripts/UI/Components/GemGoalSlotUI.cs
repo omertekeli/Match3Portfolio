@@ -1,5 +1,6 @@
 using Match3.Scripts.Core;
-using Match3.Scripts.LevelSystem.Goals;
+using Match3.Scripts.Systems.Level.Base;
+using Match3.Scripts.Systems.Level.Goals;
 using Match3.Scripts.UI.Base;
 using TMPro;
 using UnityCoreModules.Services;

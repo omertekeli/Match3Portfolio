@@ -1,5 +1,5 @@
 using System;
-using Match3.Scripts.LevelSystem.Data;
+using Match3.Scripts.Configs;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;

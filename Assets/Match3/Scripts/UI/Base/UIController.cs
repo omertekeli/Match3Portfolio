@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Match3.Scripts.UI.Base
 {
     public abstract class UIController<T> where T : UIView

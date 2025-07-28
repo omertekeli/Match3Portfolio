@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Match3.Scripts.LevelSystem.Data
+namespace Match3.Scripts.Configs
 {
     [CreateAssetMenu(menuName = "Match3/Level List")]
     public class LevelListSO : ScriptableObject

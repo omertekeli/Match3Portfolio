@@ -1,6 +1,7 @@
-using System.Threading.Tasks;
+using System;
+using Cysharp.Threading.Tasks;
 using Match3.Scripts.Enums;
-using Match3.Scripts.LevelSystem.Data;
+using Match3.Scripts.Systems.Level.Data;
 using Match3.Scripts.UI.Controllers;
 using Match3.Scripts.UI.Views;
 using UnityCoreModules.Services;
@@ -37,18 +38,18 @@ namespace Match3.Scripts.Core
             _hudController.ToggleHUD(gameState);
         }
 
-        public void SetupLevelUIAsync(LevelDataSO levelData)
+        public void SetupLevelUI(LevelDataSO levelData)
         {
             _hudController.SetupUI(levelData, ServiceLocator.Get<LevelManager>().LevelGoals);
         }
 
-        public async Task ShowLevelUIAsync(float holdTime = 1f)
+        public async UniTask ShowLevelUIAsync(float holdTime = 1f)
         {
-            await Task.Delay((int)(holdTime * 1000));
+            await UniTask.Delay(TimeSpan.FromSeconds(holdTime));
             await _fadeController.FadeToWhiteAsync();
         }
 
-        public async Task PlayLoadingTransitionAsync()
+        public async UniTask PlayLoadingTransitionAsync()
         {
             await _fadeController.FadeToBlackAsync();
         }

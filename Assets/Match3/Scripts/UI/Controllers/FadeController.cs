@@ -1,4 +1,5 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Match3.Scripts.UI.Base;
 using Match3.Scripts.UI.Views;
 
@@ -11,13 +12,20 @@ namespace Match3.Scripts.UI.Controllers
 
         #endregion
         public FadeController(FadeView view) : base(view) { }
-        internal async Task FadeToWhiteAsync() => await TryToFade(0f);
-        internal async Task FadeToBlackAsync() => await TryToFade(1f);
-        private async Task TryToFade(float targetAlpha)
+        internal async UniTask FadeToWhiteAsync(float? duration = null, Ease ease = Ease.InOutQuad)
+        {
+            await TryToFade(0f, duration, ease);
+        }
+
+        internal async UniTask FadeToBlackAsync(float? duration = null, Ease ease = Ease.InOutQuad)
+        {
+            await TryToFade(1f, duration, ease);
+        }
+        private async UniTask TryToFade(float targetAlpha, float? duration = null, Ease ease = Ease.InOutQuad)
         {
             if (_isFading) return;
             _isFading = true;
-            await View.FadeToAlpha(targetAlpha);
+            await View.FadeToAlpha(targetAlpha, duration, ease);
             _isFading = false;
         }
     }
