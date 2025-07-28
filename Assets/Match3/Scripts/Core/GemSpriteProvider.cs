@@ -1,28 +1,23 @@
 using System.Collections.Generic;
+using Match3.Scripts.Configs;
 using Match3.Scripts.Enums;
-using Match3.Scripts.Keys;
 using UnityEngine;
 
 namespace Match3.Scripts.Core
 {
-    public class GemSpriteProvider : MonoBehaviour, IService
+    public class GemSpriteProvider : IService
     {
-        [SerializeField] private List<GemTypeSpritePair> _gemSprites;
-        
-        private Dictionary<GemType, Sprite> _spriteDict;
+        private readonly Dictionary<GemType, Sprite> _spriteDict;
 
-        private void Awake()
-        {
-            SetDictionary();
-            DontDestroyOnLoad(gameObject);
-        }
-
-        private void SetDictionary()
+        public GemSpriteProvider(GemSpriteLibrarySO spriteLibrary)
         {
             _spriteDict = new Dictionary<GemType, Sprite>();
-            foreach (var pair in _gemSprites)
+            foreach (var pair in spriteLibrary.GemSprites)
             {
-                _spriteDict[pair.Type] = pair.Sprite;
+                if (pair.Sprite != null && !_spriteDict.ContainsKey(pair.Type))
+                {
+                    _spriteDict.Add(pair.Type, pair.Sprite);
+                }
             }
         }
 

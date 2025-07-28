@@ -287,7 +287,7 @@ MonoBehaviour:
   - {fileID: 2096424961}
   - {fileID: 791793422}
   - {fileID: 2327099497936328903}
-  - {fileID: 1352584087}
+  _gemSpriteLibrary: {fileID: 11400000, guid: 366f7070788e8244bacc996f79581c2a, type: 2}
 --- !u!1 &444855387
 GameObject:
   m_ObjectHideFlags: 0
@@ -748,71 +748,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1056787733}
   m_CullTransparentMesh: 1
---- !u!1 &1352584086
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1352584088}
-  - component: {fileID: 1352584087}
-  m_Layer: 0
-  m_Name: 'GemSpriteProvider '
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1352584087
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1352584086}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b72572223f24b709337c7070c27f3b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _gemSprites:
-  - Type: 0
-    Sprite: {fileID: 21300000, guid: fd97cfbc83709af4d9f25d0bd4377b21, type: 3}
-  - Type: 1
-    Sprite: {fileID: 21300000, guid: 02205626358f2714cb7a4491f7af6db9, type: 3}
-  - Type: 2
-    Sprite: {fileID: 21300000, guid: 628840329d4ea6d4183199d2a6522eea, type: 3}
-  - Type: 3
-    Sprite: {fileID: 21300000, guid: 31814d7f04784cf46bafcb066c622775, type: 3}
-  - Type: 4
-    Sprite: {fileID: 21300000, guid: 07a97c8ab722dd5448a9a398f4df65ba, type: 3}
-  - Type: 5
-    Sprite: {fileID: 21300000, guid: 502df0a0576e95b4b92cd7b54de3fcae, type: 3}
-  - Type: 7
-    Sprite: {fileID: 21300000, guid: 328a5ddf5fdcd5b47bfa2ef33d5b8d69, type: 3}
-  - Type: 8
-    Sprite: {fileID: 21300000, guid: 90499ea62345c70498ed68127cb2db83, type: 3}
-  - Type: 9
-    Sprite: {fileID: 21300000, guid: 2164a0eb1764f9a41b78e300a8ef0391, type: 3}
-  - Type: 6
-    Sprite: {fileID: 21300000, guid: bef2186c20de97c4882592c8c782b1bc, type: 3}
---- !u!4 &1352584088
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1352584086}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1313.4784, y: 1623.0724, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1661340181
 GameObject:
   m_ObjectHideFlags: 0
@@ -4316,5 +4251,4 @@ SceneRoots:
   - {fileID: 2096424960}
   - {fileID: 791793423}
   - {fileID: 7408393270847483889}
-  - {fileID: 1352584088}
   - {fileID: 1661340184}
