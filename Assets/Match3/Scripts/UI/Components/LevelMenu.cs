@@ -9,15 +9,35 @@ namespace Match3.Scripts.UI
     public class LevelMenu : MonoBehaviour
     {
         #region Fields
+
         [SerializeField] private Button[] _levelButtons;
+
         #endregion
 
         #region Events
-        public static event Action<int> LevelSelected;
+
+        public event Action<int> LevelSelected;
 
         #endregion
 
         private void Start()
+        {
+            Setup();
+            if (ServiceLocator.IsAvailable<UIManager>())
+            {
+                ServiceLocator.Get<UIManager>().RegisterLevelMenu(this);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (ServiceLocator.IsAvailable<UIManager>())
+            {
+                ServiceLocator.Get<UIManager>().UnregisterLevelMenu(this);
+            }
+        }
+
+        private void Setup()
         {
             for (int i = 0; i < _levelButtons.Length; i++)
             {

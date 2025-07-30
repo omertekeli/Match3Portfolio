@@ -1,10 +1,10 @@
-using System;
 using Cysharp.Threading.Tasks;
 using Match3.Scripts.Configs;
+using Match3.Scripts.Core.Events;
 using Match3.Scripts.Enums;
 using Match3.Scripts.Systems.Level.Data;
-using Match3.Scripts.UI;
 using UnityCoreModules.Services;
+using UnityCoreModules.Services.EventBus;
 using UnityEngine;
 
 namespace Match3.Scripts.Core
@@ -16,20 +16,11 @@ namespace Match3.Scripts.Core
         [SerializeField] private LevelListSO _levelList;
         [SerializeField] private LevelDataSO[] _levelDatas;
         [SerializeField] private float _levelLoadingHoldTime = 1f;
-
-        private GameState _gameCurrentState;
-
-        #endregion
-
-        #region Properties
-
-        public GameState GameState { get; private set; }
-
-        #endregion
-
-        #region Events
-
-        public event Action<GameState> GameStateChanged;
+        private GameState _currentState;
+        private IEventBus _eventBus;
+        private UIManager _uiManager;
+        private LevelManager _levelManager;
+        private SceneLoader _sceneLoader;
 
         #endregion
 
@@ -39,59 +30,62 @@ namespace Match3.Scripts.Core
             Application.targetFrameRate = 30;
             SetState(GameState.MainMenu);
             DontDestroyOnLoad(gameObject);
+            _eventBus = ServiceLocator.Get<IEventBus>();
+            _uiManager = ServiceLocator.Get<UIManager>();
+            _levelManager = ServiceLocator.Get<LevelManager>();
+            _sceneLoader = ServiceLocator.Get<SceneLoader>();
         }
 
         private void OnEnable()
         {
-            LevelMenu.LevelSelected += OnLevelSelected;
-            SceneLoader.LevelLoaded += OnLevelLoaded;
+            _eventBus.Subscribe<LevelLoaded>(OnLevelLoaded);
         }
 
         private void OnDisable()
         {
-            LevelMenu.LevelSelected -= OnLevelSelected;
-            SceneLoader.LevelLoaded -= OnLevelLoaded;
+            _eventBus.Unsubscribe<LevelLoaded>(OnLevelLoaded);
         }
 
         #endregion
 
         #region Methods
 
-        private void OnLevelSelected(int levelNumber)
+        public void TryToLoadLevel(int levelNumber)
         {
             Debug.Log($"Selected level {levelNumber + 1}");
             if (!_levelList.IsLevelValid(levelNumber)) return;
             LoadLevelAsync(levelNumber).Forget();
         }
 
-        private void OnLevelLoaded(int levelNumber)
+        private void OnLevelLoaded(LevelLoaded eventData)
         {
-            Debug.Log($"Loaded level {levelNumber}");
-            if (!_levelDatas[levelNumber]) return;
-            StartLevelAsync(levelNumber).Forget();
+            Debug.Log($"Loaded level {eventData.LevelIndex}");
+            if (!_levelDatas[eventData.LevelIndex]) return;
+            StartLevelAsync(eventData.LevelIndex).Forget();
         }
 
-        private async UniTaskVoid StartLevelAsync(int levelNumber)
+        private async UniTaskVoid StartLevelAsync(int LevelIndex)
         {
-            Debug.Log($"Starting level {levelNumber}");
-            var levelData = _levelDatas[levelNumber];
-            await ServiceLocator.Get<LevelManager>().InitializeLevelAsync(levelData);
-            ServiceLocator.Get<UIManager>().SetupLevelUI(levelData);
+            Debug.Log($"Starting level {LevelIndex}");
+            var levelData = _levelDatas[LevelIndex];
+            await _levelManager.InitializeLevelAsync(levelData);
+            _uiManager.SetupLevelUI(levelData);
             SetState(GameState.Gameplay);
-            await ServiceLocator.Get<UIManager>().ShowLevelUIAsync(_levelLoadingHoldTime);
+            await _uiManager.ShowLevelUIAsync(_levelLoadingHoldTime);
         }
 
         private async UniTaskVoid LoadLevelAsync(int levelNumber)
         {
             SetState(GameState.Loading);
-            await ServiceLocator.Get<UIManager>().PlayLoadingTransitionAsync();
-            ServiceLocator.Get<SceneLoader>().LoadLevel(_levelList, levelNumber);
+            await _uiManager.PlayLoadingTransitionAsync();
+            _sceneLoader.LoadLevel(_levelList, levelNumber);
         }
 
-        private void SetState(GameState state)
+        private void SetState(GameState newState)
         {
-            _gameCurrentState = state;
-            GameStateChanged?.Invoke(_gameCurrentState);
+            if (_currentState == newState) return;
+            _currentState = newState;
+            _eventBus.Fire(new GameStateChangedEvent(newState));
         }
 
         #endregion

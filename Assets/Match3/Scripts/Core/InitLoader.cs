@@ -1,6 +1,7 @@
 using Match3.Scripts.Configs;
 using Match3.Scripts.Enums;
 using UnityCoreModules.Services;
+using UnityCoreModules.Services.EventBus;
 using UnityEngine;
 
 namespace Match3.Scripts.Core
@@ -27,6 +28,10 @@ namespace Match3.Scripts.Core
         {
             var gemSpriteProvider = new GemSpriteProvider(_gemSpriteLibrary);
             ServiceLocator.Register<GemSpriteProvider>(gemSpriteProvider);
+
+            var eventBus = new EventBus();
+            ServiceLocator.Register<IEventPublisher>(eventBus);
+            ServiceLocator.Register<IEventSubscriber>(eventBus);
         }
 
         private void RegisterMonoServices()

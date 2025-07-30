@@ -5,12 +5,7 @@ namespace Match3.Scripts.Enums
         Blue,
         Red,
         Green,
-        Cream,
         Yellow,
-        Crown,
-        LightBlue,
-        Orange,
         Purple,
-        Pink
     }
 }

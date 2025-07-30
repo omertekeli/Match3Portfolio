@@ -1,5 +1,7 @@
-using System;
 using Match3.Scripts.Configs;
+using Match3.Scripts.Core.Events;
+using UnityCoreModules.Services;
+using UnityCoreModules.Services.EventBus;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,9 +9,18 @@ namespace Match3.Scripts.Core
 {
     public class SceneLoader : MonoBehaviour, IService
     {
-        public static event Action<int> LevelLoaded;
+        #region Fields
+
+        private IEventPublisher _publisher;
+        private const string PREFIX = "Level";
+
+        #endregion
+
+        #region Unity Methods
+
         private void Awake()
         {
+            _publisher = ServiceLocator.Get<IEventPublisher>();
             DontDestroyOnLoad(gameObject);
         }
 
@@ -22,6 +33,10 @@ namespace Match3.Scripts.Core
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
         }
+
+        #endregion
+
+        #region Methods
 
         public void LoadSceneByIndex(int sceneIndex)
         {
@@ -63,16 +78,15 @@ namespace Match3.Scripts.Core
             SceneManager.LoadScene(levelList.SceneList[levelNumber], LoadSceneMode.Single);
 #endif
         }
-        
+
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             Debug.Log($"Scene loaded: {scene.name}");
             NotifyLevelLoadIfValid(scene);
         }
-        
+
         private static int ExtractLevelNumberFromSceneName(string sceneName)
         {
-            const string PREFIX = "Level";
             if (!sceneName.StartsWith(PREFIX)) return -1;
             var numberStr = sceneName.Substring(PREFIX.Length);
             if (int.TryParse(numberStr, out int number))
@@ -82,10 +96,10 @@ namespace Match3.Scripts.Core
 
         private void NotifyLevelLoadIfValid(Scene scene)
         {
-            int levelNumber = GetlevelNumberFromScene(scene); 
+            int levelNumber = GetlevelNumberFromScene(scene);
             if (levelNumber == -1) return;
             var levelIndex = levelNumber - 1;
-            LevelLoaded?.Invoke(levelIndex);
+            _publisher.Fire<LevelLoaded>(new LevelLoaded(levelIndex));
         }
 
         private static int GetlevelNumberFromScene(Scene scene)
@@ -101,4 +115,6 @@ namespace Match3.Scripts.Core
             return levelNumber;
         }
     }
+
+    #endregion
 }
