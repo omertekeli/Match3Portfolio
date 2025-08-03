@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8ae050860974b88a94831bee8d90e0d, type: 3}
   m_Name: LevelList
   m_EditorClassIdentifier: 
-  Scenes:
-  - {fileID: 102900000, guid: 50b173a5c0270a741843ad5a9d7f29e1, type: 3}
-  - {fileID: 102900000, guid: 50b173a5c0270a741843ad5a9d7f29e1, type: 3}
-  - {fileID: 102900000, guid: 50b173a5c0270a741843ad5a9d7f29e1, type: 3}
-  SceneList: 
+  EditorLevels:
+  - Scene: {fileID: 102900000, guid: 50b173a5c0270a741843ad5a9d7f29e1, type: 3}
+    Data: {fileID: 11400000, guid: 86ac2b083562f2545800332058b00786, type: 2}
+  SceneBuildIndexes: 02000000
+  LevelDatas:
+  - {fileID: 11400000, guid: 86ac2b083562f2545800332058b00786, type: 2}

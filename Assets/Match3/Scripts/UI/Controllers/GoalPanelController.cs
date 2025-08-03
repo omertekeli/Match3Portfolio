@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Match3.Scripts.LevelSystem.Goals;
+using Match3.Scripts.Systems.Level.Base;
 using Match3.Scripts.UI.Base;
 using Match3.Scripts.UI.Views;
 
@@ -10,7 +10,7 @@ namespace Match3.Scripts.UI.Controllers
     {
         public GoalPanelController(GoalPanelView view) : base(view) {}
 
-        internal void SetupGoals(List<LevelGoalBase> goals)
+        internal void SetupGoals(IReadOnlyList<LevelGoalBase> goals)
         {
             View.SetGoals(goals);
         }

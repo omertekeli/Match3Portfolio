@@ -1,7 +1,7 @@
 using UnityEngine;
-using Match3.Scripts.LevelSystem.Goals;
+using Match3.Scripts.Systems.Level.Base;
 
-namespace Match3.Scripts.LevelSystem.Data
+namespace Match3.Scripts.Systems.Level.Data
 {
     public abstract class LevelGoalSO: ScriptableObject
     {

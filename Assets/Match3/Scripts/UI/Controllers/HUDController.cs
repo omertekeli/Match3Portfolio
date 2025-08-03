@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using Match3.Scripts.Enums;
-using Match3.Scripts.LevelSystem.Data;
-using Match3.Scripts.LevelSystem.Goals;
+using Match3.Scripts.Systems.Level.Base;
+using Match3.Scripts.Systems.Level.Data;
 using Match3.Scripts.UI.Base;
 using Match3.Scripts.UI.Views;
-using UnityEngine;
 
 namespace Match3.Scripts.UI.Controllers
 {
@@ -25,7 +24,7 @@ namespace Match3.Scripts.UI.Controllers
             bool shouldShow = state != GameState.MainMenu && state != GameState.Loading;
             View.SetVisible(shouldShow);
         }
-        internal void SetupUI(LevelDataSO leveldata, List<LevelGoalBase> goals)
+        internal void SetupUI(LevelDataSO leveldata, IReadOnlyList<LevelGoalBase> goals)
         {
             View.UpdateRemainingMove(leveldata.MaxMove);
             View.UpdateScore(0);

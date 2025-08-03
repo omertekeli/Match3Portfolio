@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using Match3.Scripts.LevelSystem.Goals;
+using Match3.Scripts.Systems.Level.Base;
+using Match3.Scripts.Systems.Level.Goals;
 using Match3.Scripts.UI.Base;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace Match3.Scripts.UI.Views
 
         #endregion
 
-        internal void SetGoals(List<LevelGoalBase> goals)
+        internal void SetGoals(IReadOnlyList<LevelGoalBase> goals)
         {
             ClearSlots();
             foreach (var goal in goals)

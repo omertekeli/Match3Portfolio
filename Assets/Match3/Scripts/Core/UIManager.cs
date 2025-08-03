@@ -1,9 +1,13 @@
-using System.Threading.Tasks;
-using Match3.Scripts.Enums;
-using Match3.Scripts.LevelSystem.Data;
+using System;
+using Cysharp.Threading.Tasks;
+using Match3.Scripts.Core.Events;
+using Match3.Scripts.Core.Interfaces;
+using Match3.Scripts.Systems.Level.Data;
+using Match3.Scripts.UI;
 using Match3.Scripts.UI.Controllers;
 using Match3.Scripts.UI.Views;
 using UnityCoreModules.Services;
+using UnityCoreModules.Services.EventBus;
 using UnityEngine;
 
 namespace Match3.Scripts.Core
@@ -11,46 +15,82 @@ namespace Match3.Scripts.Core
     public class UIManager : MonoBehaviour, IService
     {
         #region Fields
-
         [SerializeField] private HUDView _hudView;
         [SerializeField] private FadeView _fadeView;
-        
+        [SerializeField] private float _extraLoadingHoldDuration = 1f;
+
         private HUDController _hudController;
         private FadeController _fadeController;
-
+        private IEventSubscriber _subscriber;
         #endregion
 
+        #region Unity Methods
         private void Awake()
         {
             _hudController = new HUDController(_hudView);
             _fadeController = new FadeController(_fadeView);
+            _subscriber = ServiceLocator.Get<IEventSubscriber>();
             DontDestroyOnLoad(gameObject);
         }
 
         private void OnEnable()
         {
-            ServiceLocator.Get<GameManager>().GameStateChanged += OnGameStateChanged;
+            _subscriber.Subscribe<GameStateChangedEvent>(OnGameStateChanged);
+            _subscriber.Subscribe<LevelLoaded>(OnLevelLoaded);
         }
 
-        private void OnGameStateChanged(GameState gameState)
-        {   
-            _hudController.ToggleHUD(gameState);
-        }
-
-        public void SetupLevelUIAsync(LevelDataSO levelData)
+        void OnDisable()
         {
-            _hudController.SetupUI(levelData, ServiceLocator.Get<LevelManager>().LevelGoals);
+            _subscriber.Unsubscribe<GameStateChangedEvent>(OnGameStateChanged);
+            _subscriber.Unsubscribe<LevelLoaded>(OnLevelLoaded);
         }
 
-        public async Task ShowLevelUIAsync(float holdTime = 1f)
+        #endregion
+
+        #region Methods
+        public void RegisterLevelMenu(LevelMenu menu)
         {
-            await Task.Delay((int)(holdTime * 1000));
-            await _fadeController.FadeToWhiteAsync();
+            menu.LevelSelected += OnLevelSelection;
         }
 
-        public async Task PlayLoadingTransitionAsync()
+        public void UnregisterLevelMenu(LevelMenu menu)
         {
-            await _fadeController.FadeToBlackAsync();
+            menu.LevelSelected -= OnLevelSelection;
         }
+
+        public void SetupLevelUI(LevelDataSO levelData)
+        {
+            _hudController.SetupUI(levelData, ServiceLocator.Get<ILevelManager>().LevelGoals);
+        }
+
+        public async UniTask PlayLoadingTransitionAsync(bool isShowingLoadingScreen)
+        {
+            if (isShowingLoadingScreen)
+            {
+                await _fadeController.FadeToBlackAsync();
+            }
+            else
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(_extraLoadingHoldDuration));
+                await _fadeController.FadeToWhiteAsync();
+            }
+        }
+
+        private void OnLevelSelection(int levelIndex)
+        {
+            ServiceLocator.Get<GameManager>().RequestStartLevel(levelIndex);
+        }
+
+        private void OnLevelLoaded(LevelLoaded eventData)
+        {
+            SetupLevelUI(eventData.LevelData);
+        }
+
+        private void OnGameStateChanged(GameStateChangedEvent eventData)
+        {
+            _hudController.ToggleHUD(eventData.NewState);
+        }
+
+        #endregion
     }
 }

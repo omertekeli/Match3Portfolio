@@ -1,8 +1,9 @@
 using System;
 using Match3.Scripts.Enums;
-using Match3.Scripts.LevelSystem.Data;
+using Match3.Scripts.Systems.Level.Base;
+using Match3.Scripts.Systems.Level.Data;
 
-namespace Match3.Scripts.LevelSystem.Goals
+namespace Match3.Scripts.Systems.Level.Goals
 {
     public class GemMatchGoal: LevelGoalBase
     {

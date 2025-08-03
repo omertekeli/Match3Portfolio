@@ -1,97 +1,90 @@
 using System;
-using Match3.Scripts.LevelSystem.Data;
+using System.Linq;
+using Match3.Scripts.Configs;
+using Match3.Scripts.Systems.Level.Data;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
+using UnityEngine;
 
-namespace Match3.Scripts.Editor
+public class BuildLevelList : IPreprocessBuildWithReport
 {
-    public class BuildLevelList : IPreprocessBuildWithReport
+    public int callbackOrder => 0;
+
+    public void OnPreprocessBuild(BuildReport report)
     {
-        public int callbackOrder => 0;
+        Debug.Log("BuildLevelList: Pre-processing build, synchronizing LevelListSO...");
 
-        public void OnPreprocessBuild(BuildReport report)
+        // Find the main LevelListSO asset in the project.
+        string[] guids = AssetDatabase.FindAssets("t:LevelListSO");
+        if (guids.Length == 0)
         {
-            try
-            {
-                var levelListAssets = AssetDatabase.FindAssets("t:LevelList");
-
-                if (levelListAssets.Length == 0)
-                {
-                    throw new BuildFailedException("Couldn't find a level list, aborting the build");
-                }
-
-                var levelList =
-                    AssetDatabase.LoadAssetAtPath<LevelListSO>(AssetDatabase.GUIDToAssetPath(levelListAssets[0]));
-
-                if (levelList.Scenes.Length == 0)
-                {
-                    throw new BuildFailedException("Level list scenes array is empty, aborting the build");
-                }
-
-                var buildLevels = EditorBuildSettings.scenes;
-                var levels = new int[levelList.Scenes.Length];
-
-                bool buildListChange = false;
-
-                for (int i = 0; i < levelList.Scenes.Length; ++i)
-                {
-                    var sceneAsset = levelList.Scenes[i];
-                    var scenePath = AssetDatabase.GetAssetPath(sceneAsset);
-
-                    if (sceneAsset == null)
-                    {
-                        throw new BuildFailedException("The level list contains a null scene, fix before rebuilding");
-                    }
-      
-                    var idx = Array.FindIndex(buildLevels, scene => scene.path == scenePath);
-
-                    if (idx == -1)
-                    {
-                        idx = buildLevels.Length - 1;
-                        ArrayUtility.Add(ref buildLevels, new EditorBuildSettingsScene(scenePath, true));
-                        buildListChange = true;
-                    }
-                    else if (!buildLevels[idx].enabled)
-                    {
-                        buildLevels[idx].enabled = true;
-                        buildListChange = true;
-                    }
-
-                    levels[i] = idx;
-                }
-
-                bool levelListChanged = false;
-                for (int i = 0; i < levels.Length; ++i)
-                {
-                    if (i >= levelList.SceneList.Length || levels[i] != levelList.SceneList[i])
-                    {
-                        levelListChanged = true;
-                        break;
-                    }
-                }
-
-                if (levelListChanged)
-                {
-                    levelList.SceneList = levels;
-                    EditorUtility.SetDirty(levelList);
-                    AssetDatabase.SaveAssetIfDirty(levelList);
-                }
-
-                if (levelListChanged || buildListChange)
-                {
-                    EditorBuildSettings.scenes = buildLevels;
-                    EditorUtility.DisplayDialog("Build Stopped",
-                        "The scene list from the build had to be changed to match the list in the LevelList assets.\n" +
-                        "the scene list have now been fixed, Please restart the build.", "OK");
-
-                    throw new BuildFailedException("Level List had to be rebuilt, restart the build");
-                }
-            }
-            catch (Exception e)
-            {
-                throw new BuildFailedException($"Exception during prebuild {e.Message}");
-            }
+            throw new BuildFailedException("BuildLevelList: Could not find a LevelList asset in the project.");
         }
+
+        string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+        LevelListSO levelList = AssetDatabase.LoadAssetAtPath<LevelListSO>(path);
+        
+        if (levelList.EditorLevels == null || levelList.EditorLevels.Length == 0)
+        {
+            throw new BuildFailedException("BuildLevelList: The 'EditorLevels' array in the LevelList is empty.");
+        }
+
+        var buildScenes = EditorBuildSettings.scenes.ToList();
+        
+        // Create lists to hold the processed data.
+        var runtimeLevelDatas = new LevelDataSO[levelList.EditorLevels.Length];
+        var runtimeSceneIndexes = new int[levelList.EditorLevels.Length];
+
+        bool buildSettingsChanged = false;
+        
+        for (int i = 0; i < levelList.EditorLevels.Length; i++)
+        {
+            var mapping = levelList.EditorLevels[i];
+            var sceneAsset = mapping.Scene;
+
+            if (sceneAsset == null || mapping.Data == null)
+            {
+                throw new BuildFailedException($"BuildLevelList: Entry {i} in LevelListSO is invalid. Scene or Data is null.");
+            }
+
+            string scenePath = AssetDatabase.GetAssetPath(sceneAsset);
+            int sceneIndexInBuildSettings = buildScenes.FindIndex(s => s.path == scenePath);
+
+            // If the scene is not in the build settings, add it.
+            if (sceneIndexInBuildSettings == -1)
+            {
+                sceneIndexInBuildSettings = buildScenes.Count;
+                buildScenes.Add(new EditorBuildSettingsScene(scenePath, true));
+                buildSettingsChanged = true;
+                Debug.Log($"BuildLevelList: Added '{scenePath}' to Build Settings at index {sceneIndexInBuildSettings}.");
+            }
+            // If the scene is in the build settings but disabled, enable it.
+            else if (!buildScenes[sceneIndexInBuildSettings].enabled)
+            {
+                buildScenes[sceneIndexInBuildSettings].enabled = true;
+                buildSettingsChanged = true;
+                Debug.Log($"BuildLevelList: Enabled '{scenePath}' in Build Settings.");
+            }
+            
+            // Store the final data for runtime.
+            runtimeSceneIndexes[i] = sceneIndexInBuildSettings;
+            runtimeLevelDatas[i] = mapping.Data;
+        }
+
+        // Update the LevelListSO asset with the new runtime data.
+        levelList.SceneBuildIndexes = runtimeSceneIndexes;
+        levelList.LevelDatas = runtimeLevelDatas;
+        EditorUtility.SetDirty(levelList);
+        AssetDatabase.SaveAssets();
+        
+        // If we changed the build settings, update them.
+        if (buildSettingsChanged)
+        {
+            EditorBuildSettings.scenes = buildScenes.ToArray();
+            Debug.Log("BuildLevelList: Updated EditorBuildSettings.scenes.");
+        }
+        
+        Debug.Log("BuildLevelList: Synchronization complete.");
     }
 }

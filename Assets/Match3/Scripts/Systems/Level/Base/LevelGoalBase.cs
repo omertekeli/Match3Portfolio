@@ -1,6 +1,6 @@
 using System;
 
-namespace Match3.Scripts.LevelSystem.Goals
+namespace Match3.Scripts.Systems.Level.Base
 {
     public abstract class LevelGoalBase
     {

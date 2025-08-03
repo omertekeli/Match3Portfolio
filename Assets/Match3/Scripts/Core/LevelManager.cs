@@ -1,39 +1,72 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
-using Match3.Scripts.LevelSystem.Data;
-using Match3.Scripts.LevelSystem.Goals;
-using NUnit.Framework;
-using UnityEditor;
+using Match3.Scripts.Systems.Board;
+using Match3.Scripts.Systems.Level.Data;
+using UnityCoreModules.Services.EventBus;
+using Match3.Scripts.Systems.Level.Base;
+using System.Collections.Generic;
+using Match3.Scripts.Core;
+using Match3.Scripts.Core.Events;
+using Match3.Scripts.Core.Interfaces;
 
-namespace Match3.Scripts.Core
+public class LevelManager : IService, ILevelManager
 {
-    public class LevelManager: MonoBehaviour, IService
+    #region Fields
+    private readonly GameObject _boardPrefab;
+    private readonly LevelListSO _levelList;
+    private readonly ISceneLoader _sceneLoader;
+    private readonly IEventPublisher _publisher;
+    private Board _currentBoard;
+    private List<LevelGoalBase> _levelGoals;
+    #endregion
+
+    #region Properties
+    public int RemainingMove { get; private set; }
+    public IReadOnlyList<LevelGoalBase> LevelGoals => _levelGoals;
+    #endregion
+
+    public LevelManager(
+        GameObject boardPrefab, LevelListSO levelList, ISceneLoader sceneLoader, IEventPublisher publisher)
     {
-        #region Properties
-        
-        public int RemaningMove { get; private set; }
-        public List<LevelGoalBase> LevelGoals {get; private set;}
-        
-        #endregion
-        
-        #region Events
-
-        public event Action OnAllGoalCompleted;
-        
-        #endregion
-        
-        private void Awake()
+        _boardPrefab = boardPrefab;
+        _levelList = levelList;
+        _sceneLoader = sceneLoader;
+        _publisher = publisher;
+    }
+    public async UniTask LoadAndSetupLevelAsync(int levelIndex)
+    {
+        Debug.Log($"Tryin to load level index {levelIndex}");
+        if (!_levelList.IsLevelValid(levelIndex))
         {
-            DontDestroyOnLoad(gameObject);
+            throw new System.ArgumentOutOfRangeException(
+                nameof(levelIndex), $"Invalid level index requested: {levelIndex}"
+                );
         }
 
-        public Task InitializeLevelAsync(LevelDataSO levelData)
-        {
-            RemaningMove = levelData.MaxMove;
-            LevelGoals = levelData.CreateRuntimeGoals();
-            return Task.CompletedTask;
-        }
+        int buildIndex = _levelList.SceneBuildIndexes[levelIndex];
+        await _sceneLoader.LoadSceneByIndexAsync(buildIndex);
+
+        LevelDataSO levelData = _levelList.LevelDatas[levelIndex];
+        await SpawnBoardAsync(levelData);
+        
+        InitializeLevelRules(levelData);
+
+        _publisher.Fire(new LevelLoaded(levelIndex, levelData));
+    }
+
+    private async UniTask SpawnBoardAsync(LevelDataSO levelData)
+    {
+        if (_currentBoard != null)
+            Object.Destroy(_currentBoard.gameObject);
+        GameObject boardGO = Object.Instantiate(_boardPrefab);
+        _currentBoard = boardGO.GetComponent<Board>();
+        await _currentBoard.CreateBoardAsycnc(levelData);
+    }
+
+    private void InitializeLevelRules(LevelDataSO levelData)
+    {
+        RemainingMove = levelData.MaxMove;
+        _levelGoals = levelData.CreateRuntimeGoals();
+        Debug.Log($"Level {levelData.LevelNumber} rules initialized. Max moves: {levelData.MaxMove}");
     }
 }
