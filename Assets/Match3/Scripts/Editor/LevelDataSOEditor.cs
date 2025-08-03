@@ -10,8 +10,10 @@ using Match3.Scripts.Configs;
 [CustomEditor(typeof(LevelDataSO))]
 public class LevelDataSOEditor : Editor
 {
+    // A private field to store the index of the currently selected tile in the grid.
+    private int _selectedIndex = -1;
+
     // --- Sprite Cache for Performance ---
-    // We store references here to avoid searching the project for assets repeatedly.
     private static GemSpriteLibrarySO _gemSpriteLibrary;
     private static Dictionary<GemType, Sprite> _gemSpriteCache;
 
@@ -20,18 +22,12 @@ public class LevelDataSOEditor : Editor
     /// </summary>
     private void FindAndCacheAssets()
     {
-        // We only need to do this once per editor session.
-        if (_gemSpriteLibrary != null && _gemSpriteCache != null) return;
-        
-        // Find all assets of type GemSpriteLibrarySO in the project.
+        if (_gemSpriteLibrary != null) return;
         string[] guids = AssetDatabase.FindAssets("t:GemSpriteLibrarySO");
         if (guids.Length > 0)
         {
-            // Get the path of the first found asset.
             string path = AssetDatabase.GUIDToAssetPath(guids[0]);
             _gemSpriteLibrary = AssetDatabase.LoadAssetAtPath<GemSpriteLibrarySO>(path);
-
-            // Populate the dictionary for fast sprite lookups.
             _gemSpriteCache = new Dictionary<GemType, Sprite>();
             if (_gemSpriteLibrary != null)
             {
@@ -48,38 +44,30 @@ public class LevelDataSOEditor : Editor
     /// </summary>
     public override void OnInspectorGUI()
     {
-        // Make sure our sprite cache is populated.
         FindAndCacheAssets();
-        
-        // These two commands are essential for making sure the editor handles data correctly (Undo, Saving, etc.).
         serializedObject.Update();
 
-        // Draw all default properties EXCEPT the one we are going to draw manually.
         DrawPropertiesExcluding(serializedObject, "_tileSetups");
         
-        // Apply changes to properties like Width/Height immediately to help OnValidate fire faster.
-        serializedObject.ApplyModifiedProperties(); 
+        serializedObject.ApplyModifiedProperties();
         serializedObject.Update();
 
         EditorGUILayout.Space(20);
-        EditorGUILayout.LabelField("Board Tasarım Editörü", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Board Tasarım Editörü (Hücre seçmek için tıklayın)", EditorStyles.boldLabel);
 
-        // Get the SerializedProperty objects we need to work with.
         SerializedProperty widthProp = serializedObject.FindProperty("_width");
         SerializedProperty heightProp = serializedObject.FindProperty("_height");
         SerializedProperty setupsProp = serializedObject.FindProperty("_tileSetups");
-        SerializedProperty availableTypesProp = serializedObject.FindProperty("_availablePieceTypes");
         
-        // Safety check to prevent errors when resizing the board.
         if (setupsProp.arraySize != widthProp.intValue * heightProp.intValue)
         {
-            EditorGUILayout.HelpBox("Genişlik veya Yükseklik değiştirildi, dizi yeniden boyutlandırılıyor...", MessageType.Info);
+            EditorGUILayout.HelpBox("Layout is being redefined...", MessageType.Info);
         }
         else
         {
-            // If dimensions match the array size, draw the grid safely.
+            // A grid of selectable buttons for a quick overview ---
             EditorGUILayout.BeginVertical(GUI.skin.box);
-            for (int y = 0; y < heightProp.intValue; y++)
+            for (int y = heightProp.intValue - 1; y >= 0; y--)
             {
                 EditorGUILayout.BeginHorizontal();
                 for (int x = 0; x < widthProp.intValue; x++)
@@ -89,83 +77,177 @@ public class LevelDataSOEditor : Editor
                     
                     Color originalColor = GUI.backgroundColor;
                     
-                    // --- Determine Cell Color ---
                     InitialTileType groundType = (InitialTileType)tileSetupProp.FindPropertyRelative("groundType").enumValueIndex;
-                    if (groundType == InitialTileType.Hole) GUI.backgroundColor = Color.black;
-                    else if (groundType == InitialTileType.Generator) GUI.backgroundColor = new Color(0.7f, 1f, 0.7f);
+                    if (groundType == InitialTileType.Hole) GUI.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 1f);
+                    else if (groundType == InitialTileType.Generator) GUI.backgroundColor = new Color(0.7f, 1f, 0.7f, 1f);
                     
-                    PredefinedContentType contentType = (PredefinedContentType)tileSetupProp.FindPropertyRelative("contentType").enumValueIndex;
-                    if(contentType != PredefinedContentType.None) GUI.backgroundColor = Color.Lerp(GUI.backgroundColor, Color.cyan, 0.3f);
-
-                    EditorGUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(120), GUILayout.Height(85));
-
-                    // --- Draw Cell Controls ---
-                    SerializedProperty groundProp = tileSetupProp.FindPropertyRelative("groundType");
-                    SerializedProperty contentProp = tileSetupProp.FindPropertyRelative("contentType");
-
-                    groundProp.enumValueIndex = (int)(InitialTileType)EditorGUILayout.EnumPopup((InitialTileType)groundProp.enumValueIndex);
-                    
-                    bool isHole = (InitialTileType)groundProp.enumValueIndex == InitialTileType.Hole;
-                    EditorGUI.BeginDisabledGroup(isHole);
-                    if (isHole) contentProp.enumValueIndex = (int)PredefinedContentType.None;
-                    
-                    contentProp.enumValueIndex = (int)(PredefinedContentType)EditorGUILayout.EnumPopup((PredefinedContentType)contentProp.enumValueIndex);
-                    EditorGUI.EndDisabledGroup();
-
-                    Sprite spriteToShow = null;
-                    switch ((PredefinedContentType)contentProp.enumValueIndex)
+                    if (index == _selectedIndex)
                     {
-                        case PredefinedContentType.SpecificGem:
-                            SerializedProperty gemProp = tileSetupProp.FindPropertyRelative("gemType");
-
-                            // --- DYNAMIC DROPDOWN LOGIC ---
-                            List<string> availableGemNames = new List<string>();
-                            List<int> availableGemValues = new List<int>();
-                            for (int i = 0; i < availableTypesProp.arraySize; i++)
-                            {
-                                int enumIndex = availableTypesProp.GetArrayElementAtIndex(i).enumValueIndex;
-                                availableGemNames.Add(((GemType)enumIndex).ToString());
-                                availableGemValues.Add(enumIndex);
-                            }
-
-                            gemProp.enumValueIndex = EditorGUILayout.IntPopup(gemProp.enumValueIndex, availableGemNames.ToArray(), availableGemValues.ToArray());
-                            // --- END DYNAMIC DROPDOWN ---
-                            
-                            if (_gemSpriteCache != null) _gemSpriteCache.TryGetValue((GemType)gemProp.enumValueIndex, out spriteToShow);
-                            break;
-
-                        case PredefinedContentType.BoardPower:
-                            SerializedProperty powerProp = tileSetupProp.FindPropertyRelative("powerData");
-                            EditorGUILayout.PropertyField(powerProp, GUIContent.none);
-                            if(powerProp.objectReferenceValue != null) spriteToShow = (powerProp.objectReferenceValue as BoardPowerDataSO)?.Sprite;
-                            break;
-
-                        case PredefinedContentType.Obstacle:
-                            SerializedProperty obstacleProp = tileSetupProp.FindPropertyRelative("obstacleData");
-                            EditorGUILayout.PropertyField(obstacleProp, GUIContent.none);
-                            if(obstacleProp.objectReferenceValue != null) spriteToShow = (obstacleProp.objectReferenceValue as ObstacleDataSO)?.Sprite;
-                            break;
-                    }
-                    
-                    if (spriteToShow != null)
-                    {
-                        Rect spriteRect = GUILayoutUtility.GetRect(25, 25);
-                        DrawSprite(spriteRect, spriteToShow);
+                        GUI.backgroundColor = Color.Lerp(GUI.backgroundColor, Color.yellow, 0.6f);
                     }
 
-                    EditorGUILayout.EndVertical();
-                    GUI.backgroundColor = originalColor; // Restore original color
+                    if (GUILayout.Button("", GUILayout.Width(50), GUILayout.Height(50)))
+                    {
+                        _selectedIndex = index;
+                    }
+                    
+                    Rect buttonRect = GUILayoutUtility.GetLastRect();
+                    DrawSpritePreview(buttonRect, tileSetupProp);
+
+                    GUI.backgroundColor = originalColor;
                 }
                 EditorGUILayout.EndHorizontal();
             }
             EditorGUILayout.EndVertical();
+            
+            EditorGUILayout.Space(20);
+
+            // --- DETAIL VIEW: Shows the editable properties for the selected tile ---
+            if (_selectedIndex != -1 && _selectedIndex < setupsProp.arraySize)
+            {
+                int selectedX = _selectedIndex % widthProp.intValue;
+                int selectedY = _selectedIndex / widthProp.intValue;
+                
+                EditorGUILayout.LabelField($"Selected Cell Settings ({selectedX}, {selectedY})", EditorStyles.boldLabel);
+                EditorGUILayout.BeginVertical(GUI.skin.box);
+                
+                SerializedProperty selectedTileProp = setupsProp.GetArrayElementAtIndex(_selectedIndex);
+                DrawConditionalContentFields(selectedTileProp);
+
+                EditorGUILayout.EndVertical();
+            }
         }
         
         serializedObject.ApplyModifiedProperties();
     }
     
     /// <summary>
-    /// Draws a sprite in the editor GUI, respecting its atlas coordinates.
+    /// Helper method to draw the detailed property fields for a single selected tile.
+    /// </summary>
+    private void DrawConditionalContentFields(SerializedProperty tileSetupProp)
+    {
+        SerializedProperty availableTypesProp = serializedObject.FindProperty("_availablePieceTypes");
+        
+        EditorGUILayout.PropertyField(tileSetupProp.FindPropertyRelative("groundType"));
+        
+        SerializedProperty contentProp = tileSetupProp.FindPropertyRelative("contentType");
+        SerializedProperty overlayProp = tileSetupProp.FindPropertyRelative("overlayObstacleData");
+        
+        InitialTileType groundType = (InitialTileType)tileSetupProp.FindPropertyRelative("groundType").enumValueIndex;
+        bool isHole = groundType == InitialTileType.Hole;
+
+        EditorGUI.BeginDisabledGroup(isHole);
+        
+        if (isHole)
+        {
+            contentProp.enumValueIndex = (int)PredefinedContentType.RandomGem;
+            overlayProp.objectReferenceValue = null;
+        }
+
+        EditorGUILayout.PropertyField(contentProp);
+
+        PredefinedContentType contentType = (PredefinedContentType)contentProp.enumValueIndex;
+        
+        switch (contentType)
+        {
+            case PredefinedContentType.SpecificGem:
+                SerializedProperty gemProp = tileSetupProp.FindPropertyRelative("gemType");
+                List<string> availableGemNames = new List<string>();
+                List<int> availableGemValues = new List<int>();
+                for (int i = 0; i < availableTypesProp.arraySize; i++)
+                {
+                    int enumIndex = availableTypesProp.GetArrayElementAtIndex(i).enumValueIndex;
+                    availableGemNames.Add(((GemType)enumIndex).ToString());
+                    availableGemValues.Add(enumIndex);
+                }
+                if (availableGemNames.Count == 0) EditorGUILayout.HelpBox("Add types to 'Available Piece Types'!", MessageType.Warning);
+                else gemProp.enumValueIndex = EditorGUILayout.IntPopup("Gem Type", gemProp.enumValueIndex, availableGemNames.ToArray(), availableGemValues.ToArray());
+                break;
+            case PredefinedContentType.BoardPower:
+                EditorGUILayout.PropertyField(tileSetupProp.FindPropertyRelative("powerData"));
+                break;
+            case PredefinedContentType.ContentObstacle:
+                EditorGUILayout.PropertyField(tileSetupProp.FindPropertyRelative("contentObstacleData"));
+                break;
+        }
+
+        bool canHaveOverlay = contentType == PredefinedContentType.RandomGem ||
+                              contentType == PredefinedContentType.SpecificGem ||
+                              contentType == PredefinedContentType.BoardPower;
+
+        if (canHaveOverlay)
+        {
+            EditorGUILayout.PropertyField(overlayProp);
+            if (overlayProp.objectReferenceValue != null)
+            {
+                var overlayData = overlayProp.objectReferenceValue as ObstacleDataSO;
+                if (overlayData != null && overlayData.PlacementType != ObstaclePlacementType.Overlay)
+                {
+                    EditorGUILayout.HelpBox("Only 'Overlay' type obstacles allowed.", MessageType.Error);
+                    overlayProp.objectReferenceValue = null;
+                }
+            }
+        }
+        else
+        {
+            overlayProp.objectReferenceValue = null;
+        }
+        
+        EditorGUI.EndDisabledGroup();
+    }
+
+    /// <summary>
+    /// Helper method to find the correct sprite and draw it in a given Rect.
+    /// </summary>
+    private void DrawSpritePreview(Rect position, SerializedProperty tileSetupProp)
+    {
+        Sprite spriteToShow = null;
+        
+        // Prioritize showing the overlay sprite.
+        var overlayProp = tileSetupProp.FindPropertyRelative("overlayObstacleData");
+        if (overlayProp.objectReferenceValue != null)
+        {
+            spriteToShow = (overlayProp.objectReferenceValue as ObstacleDataSO)?.Sprite;
+        }
+        
+        // If no overlay, show the content sprite.
+        if (spriteToShow == null)
+        {
+            var contentType = (PredefinedContentType)tileSetupProp.FindPropertyRelative("contentType").enumValueIndex;
+            switch (contentType)
+            {
+                case PredefinedContentType.SpecificGem:
+                    if (_gemSpriteCache != null)
+                    {
+                        var gemProp = tileSetupProp.FindPropertyRelative("gemType");
+                        _gemSpriteCache.TryGetValue((GemType)gemProp.enumValueIndex, out spriteToShow);
+                    }
+                    break;
+                case PredefinedContentType.BoardPower:
+                    var powerProp = tileSetupProp.FindPropertyRelative("powerData");
+                    if (powerProp.objectReferenceValue != null) spriteToShow = (powerProp.objectReferenceValue as BoardPowerDataSO)?.Sprite;
+                    break;
+                case PredefinedContentType.ContentObstacle:
+                    var obstacleProp = tileSetupProp.FindPropertyRelative("contentObstacleData");
+                    if (obstacleProp.objectReferenceValue != null) spriteToShow = (obstacleProp.objectReferenceValue as ObstacleDataSO)?.Sprite;
+                    break;
+            }
+        }
+
+        if (spriteToShow != null)
+        {
+            // Center the sprite inside the button rect.
+            float smallerSize = Mathf.Min(position.width, position.height) * 0.8f;
+            float xOffset = (position.width - smallerSize) / 2f;
+            float yOffset = (position.height - smallerSize) / 2f;
+            Rect spriteRect = new Rect(position.x + xOffset, position.y + yOffset, smallerSize, smallerSize);
+            
+            DrawSprite(spriteRect, spriteToShow);
+        }
+    }
+    
+    /// <summary>
+    /// Low-level method to draw a sprite in the editor GUI, respecting its atlas coordinates.
     /// </summary>
     private void DrawSprite(Rect position, Sprite sprite)
     {

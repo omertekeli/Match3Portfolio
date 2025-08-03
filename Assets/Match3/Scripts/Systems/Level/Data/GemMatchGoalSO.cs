@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Match3.Scripts.Systems.Level.Data
 {
-    [CreateAssetMenu(menuName = "Match3/Gem Match Goal")]
+    [CreateAssetMenu(fileName = "GemMatch_", menuName = "Match3/Gem Match Goal")]
     public class GemMatchGoalSO: LevelGoalSO
     {
         [SerializeField] private GemGoalData _goalData;

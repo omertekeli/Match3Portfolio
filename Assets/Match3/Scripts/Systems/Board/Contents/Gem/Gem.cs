@@ -1,14 +1,18 @@
+using Match3.Scripts.Enums;
+
 namespace Match3.Scripts.Systems.Board.Contents.Gem
 {
-    public class Gem
+    public class Gem : IBoardContent
     {
-        public GemData Data { get; private set; }
-        public GemView View { get; private set; }
-
-        public void Bind(GemData data, GemView view)
+        public GemType Type { get; private set; }
+        public Gem(GemType type)
         {
-            Data = data;
-            View = view;
+            Type = type;
+        }
+
+        public bool CanBeSwapped()
+        {
+            return true;
         }
     }
 }

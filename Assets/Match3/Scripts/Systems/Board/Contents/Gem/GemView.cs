@@ -1,22 +1,13 @@
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using UnityEngine;
 
 namespace Match3.Scripts.Systems.Board.Contents.Gem
 {
     public class GemView : MonoBehaviour
     {
-        [SerializeField] private SpriteRenderer _spriteRenderer;
-        public void SetSprite(Sprite sprite) => _spriteRenderer.sprite = sprite;
-
-        public async UniTask PlayMatchAnimationAsync()
+        [SerializeField] private SpriteRenderer _renderer;
+        public void SetSprite(Sprite sprite)
         {
-            
-        }
-
-        public async UniTask PlaySpawnAnimation()
-        {
-
+            if (_renderer != null) _renderer.sprite = sprite;
         }
     }
 }

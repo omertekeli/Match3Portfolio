@@ -16,7 +16,7 @@ namespace Match3.Scripts.UI.Views
 
         #endregion
 
-        internal void SetGoals(List<LevelGoalBase> goals)
+        internal void SetGoals(IReadOnlyList<LevelGoalBase> goals)
         {
             ClearSlots();
             foreach (var goal in goals)

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10efa830199d4894ba817e63117112bf, type: 3}
+  m_Name: PiecePrefabDB
+  m_EditorClassIdentifier: 
+  GenericGemPrefab: {fileID: 4752002983706128665, guid: 8fb0b8df7fd182f43b7b56a62384e757, type: 3}
+  BoardPowerPrefabs:
+  - Data: {fileID: 11400000, guid: 112f0eda9daa5a44486828f8a6c83684, type: 2}
+    Prefab: {fileID: 2004335099783351017, guid: a6e50174cf894614fbbf93103ac6b91e, type: 3}
+  ObstaclePrefabs: []

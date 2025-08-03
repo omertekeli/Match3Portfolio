@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Match3.Scripts.Systems.Level.Data
 {
-    [CreateAssetMenu(menuName = "Match3/Level Data")]
+    [CreateAssetMenu(fileName = "Level_000", menuName = "Match3/Level Data")]
     public class LevelDataSO : ScriptableObject
     {
         [Header("General")]
@@ -29,7 +29,7 @@ namespace Match3.Scripts.Systems.Level.Data
         public AudioClip Music => _music;
         public int Width => _width;
         public int Height => _height;
-        public TileSetupData[] TileSetup => _tileSetups;
+        public TileSetupData[] TileSetups => _tileSetups;
         public IReadOnlyList<GemType> AvailablePieceTypes => _availablePieceTypes;
 
         [SerializeField] private LevelGoalSO[] _levelGoals;

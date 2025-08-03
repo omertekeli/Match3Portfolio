@@ -20,7 +20,7 @@ namespace Match3.Scripts.Systems.Board.Data
         #region Layer Properties
 
         public IBoardContent Content { get; private set; }
-        public List<IOverlay> Overlays { get; private set; }
+        public IOverlay Overlay { get; private set; }
 
         #endregion
 
@@ -28,12 +28,13 @@ namespace Match3.Scripts.Systems.Board.Data
         public bool IsPlayable => Behavior != CellBehaviorType.Hole;
         public bool IsEmpty => Content == null;
         public bool HasGem => Content is Gem;
+        public bool HasOverlay => Overlay != null;
         public bool IsMatchable
         {
             get
             {
                 if (!HasGem) return false;
-                if (Overlays.Any(overlay => overlay.IsBlockingMatch())) return false;
+                if (HasOverlay && Overlay.IsBlockingMatch()) return false;
                 return true;
             }
         }
@@ -42,26 +43,51 @@ namespace Match3.Scripts.Systems.Board.Data
             get
             {
                 if (!IsPlayable || IsEmpty) return false;
-                if (Overlays.Any(overlay => overlay.IsBlockingSwap())) return false;
+                if (HasOverlay && Overlay.IsBlockingSwap()) return false;
                 if (!Content.CanBeSwapped()) return false;
                 return true;
             }
         }
 
-
         #endregion
 
         public TileNode(int x, int y, CellBehaviorType behavior)
         {
-            GridPosition = new Vector2Int(x, y);
             Behavior = behavior;
+            GridPosition = new Vector2Int(x, y);
             Neighbors = new Dictionary<Direction, TileNode>();
-            Overlays = new List<IOverlay>();
         }
 
         #region Methods
 
+        /// <summary>
+        /// Sets the main content of this tile. Should only be used during board creation or when content is cleared.
+        /// </summary>
+        public void SetContent(IBoardContent newContent)
+        {
+            if (Content != null && newContent != null)
+            {
+                Debug.LogWarning($"Tile at {GridPosition} already has content! Overwriting.");
+            }
+            Content = newContent;
+        }
 
+        /// <summary>
+        /// Adds an overlay to this tile.
+        /// </summary>
+        public void SetOverlay(IOverlay newOverlay)
+        {
+            if (Overlay != null && newOverlay != null)
+            {
+                Debug.LogWarning($"Tile at {GridPosition} already has overlay! Overwriting.");
+            }
+            Overlay = newOverlay;
+        }
+
+        public void ClearOverlay()
+        {
+            Overlay = null;
+        }
 
         #endregion
     }

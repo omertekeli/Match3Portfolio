@@ -14,11 +14,303 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _levelNumber: 2
   _maxMove: 15
-  _lowMoveTrigger: 3
-  _borderMargin: 0.3
-  _backgroundSprite: {fileID: 0}
+  _availablePieceTypes: 00000000
+  _width: 7
+  _height: 7
+  _tileSetups:
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
   _music: {fileID: 0}
-  _levelGoals:
-  - {fileID: 11400000, guid: 75c4d354708806f4eb8074c74037ac4f, type: 2}
-  - {fileID: 11400000, guid: 1feac7144a00c0b4cb31aa6c31296bb8, type: 2}
-  - {fileID: 11400000, guid: d9030fb4f38ec97459846693c16d6423, type: 2}
+  _levelGoals: []
