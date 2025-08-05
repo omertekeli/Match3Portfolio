@@ -1,19 +1,28 @@
-using Match3.Scripts.Systems.Board.Contents.Obstacle;
 using UnityEngine;
 
 namespace Match3.Scripts.Systems.Board.Contents.Obstacle
 {
-    public class ObstacleView : MonoBehaviour
+    public class ObstacleView : PieceView
     {
         [SerializeField] private SpriteRenderer _renderer;
-        private Obstacle _model;
+
         public void Initialize(Obstacle model)
         {
-            _model = model;
-            _renderer.sprite = _model.Data.Sprite;
+            base.Initialize(model);
+            _renderer.sprite = model.Data.Sprite;
+            // model.OnHealthChanged += OnHealthChanged;
+        }
 
-            // Subscribe brain events
-            // e.g. _model.OnHealthChanged += PlayShakeAnimation;
+        private void OnHealthChanged(int newHealth)
+        {
+            
+        }
+
+        private void OnDestroy()
+        {
+            // var model = this.Model as Obstacle;
+            // if(model != null) 
+                //model.OnHealthChanged -= OnHealthChanged;
         }
     }
 }

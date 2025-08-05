@@ -19,55 +19,42 @@ public class GameManager : MonoBehaviour, IService
 
     private void Awake()
     {
-        // ÖNEMLİ DÜZELTME: Eksik olan servisleri de burada alıyoruz.
         _publisher = ServiceLocator.Get<IEventPublisher>();
         _uiManager = ServiceLocator.Get<UIManager>();
         _levelManager = ServiceLocator.Get<ILevelManager>();
         _sceneLoader = ServiceLocator.Get<ISceneLoader>();
     }
-    
-    // UI veya diğer sistemlerden gelen istekler bu public metotları çağırır.
+
     public void RequestStartLevel(int levelIndex)
     {
-        TransitionWorkflowAsync(GameState.Gameplay, levelIndex).Forget();
+        LoadLevelWorkflowAsync(levelIndex).Forget();
     }
 
     public void RequestReturnToMainMenu()
     {
-        TransitionWorkflowAsync(GameState.MainMenu).Forget();
+        _sceneLoader.LoadSceneByIndexAsync((int)SceneIndex.MainMenu).Forget();
     }
 
-    private async UniTaskVoid TransitionWorkflowAsync(GameState targetState, int levelIndex = -1)
+    private async UniTaskVoid LoadLevelWorkflowAsync(int levelIndex)
     {
-        if (_currentState == GameState.Loading || _currentState == targetState)
+        if (_currentState == GameState.Loading)
             return;
 
         try
         {
             SetState(GameState.Loading);
             await _uiManager.PlayLoadingTransitionAsync(true);
-
-            switch (targetState)
-            {
-                case GameState.MainMenu:
-                    await _sceneLoader.LoadSceneByIndexAsync((int)SceneIndex.MainMenu);
-                    break;
-                case GameState.Gameplay:
-                    await _levelManager.LoadAndSetupLevelAsync(levelIndex);
-                    break;
-            }
-
+            await _levelManager.LoadAndSetupLevelAsync(levelIndex);
             await _uiManager.PlayLoadingTransitionAsync(false);
-            SetState(targetState);
+            await _levelManager.PlayLevelIntroAnimationAsync();
+            SetState(GameState.Gameplay);
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Failed to transition to state {targetState}. Error: {e.Message}\n{e.StackTrace}");
+            Debug.LogError($"Failed to transition to state {GameState.Gameplay}. Error: {e.Message}\n{e.StackTrace}");
             if (_currentState != GameState.MainMenu)
             {
-                await _uiManager.PlayLoadingTransitionAsync(false);
                 RequestReturnToMainMenu();
-                SetState(GameState.MainMenu);
             }
         }
     }

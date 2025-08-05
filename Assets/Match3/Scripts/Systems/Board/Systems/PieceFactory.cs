@@ -1,92 +1,173 @@
+using UnityEngine;
 using System.Collections.Generic;
 using Match3.Scripts.Core;
-using Match3.Scripts.Enums;
-using Match3.Scripts.Systems.Board.Contents;
-using Match3.Scripts.Systems.Board.Contents.BoardPower;
+using Match3.Scripts.Systems.Board.Data;
+using Match3.Scripts.Systems.Level.Data;
 using Match3.Scripts.Systems.Board.Contents.Gem;
 using Match3.Scripts.Systems.Board.Contents.Obstacle;
+using Match3.Scripts.Systems.Board.Contents.BoardPower;
+using UnityCoreModules.Services;
 using Match3.Scripts.Systems.Board.Contents.Obstacle.Content;
 using Match3.Scripts.Systems.Board.Contents.Obstacle.Overlay;
-using Match3.Scripts.Systems.Board.Data;
-using UnityCoreModules.Services;
-using UnityEngine;
+using Match3.Scripts.Systems.Board.Contents;
 
 namespace Match3.Scripts.Systems.Board.Systems
 {
-    public class PieceFactory: IPieceFactory
+    public class PieceFactory : IPieceFactory
     {
+        #region Fields
         private readonly PiecePrefabDB _prefabDB;
         private readonly Transform _contentContainer;
+        private readonly Transform _overlayContainer;
         private readonly GemSpriteProvider _gemSpriteProvider;
 
         private readonly Dictionary<ObstacleType, GameObject> _obstaclePrefabDict = new();
         private readonly Dictionary<BoardPowerType, GameObject> _boardPowerPrefabDict = new();
+        #endregion
 
-        public PieceFactory(PiecePrefabDB prefabDB, Transform contentContainer)
+        public PieceFactory(PiecePrefabDB prefabDB, Transform contentContainer, Transform overlayContainer)
         {
             _prefabDB = prefabDB;
             _contentContainer = contentContainer;
+            _overlayContainer = overlayContainer;
             _gemSpriteProvider = ServiceLocator.Get<GemSpriteProvider>();
 
             foreach (var mapping in _prefabDB.ObstaclePrefabs)
-            { _obstaclePrefabDict[mapping.Data.Type] = mapping.Prefab; }
+            {
+                _obstaclePrefabDict[mapping.Data.Type] = mapping.Prefab;
+            }
             foreach (var mapping in _prefabDB.BoardPowerPrefabs)
-            { _boardPowerPrefabDict[mapping.Data.Type] = mapping.Prefab; }
-        }
-        public void CreateGem(TileNode node, Vector3 position, GemType gemType)
-        {
-            GameObject gemGO = Object.Instantiate(_prefabDB.GenericGemPrefab, position, Quaternion.identity, _contentContainer);
-            gemGO.name = $"Gem_{gemType} ({node.GridPosition.x},{node.GridPosition.y})";
-
-            var gemView = gemGO.GetComponent<GemView>();
-            Sprite sprite = _gemSpriteProvider.GetSprite(gemType);
-            if (gemView != null) gemView.SetSprite(sprite);
-
-            var gem = new Gem(gemType);
-            node.SetContent(gem);
-        }
-
-        public void CreateObstacle(TileNode node, Vector3 position, ObstacleDataSO data)
-        {
-            if (data == null || !_obstaclePrefabDict.TryGetValue(data.Type, out GameObject prefab)) return;
-
-            Obstacle obstacleInstance = null;
-            switch (data.Type)
             {
-                case ObstacleType.Crate:
-                    obstacleInstance = new Crate(node, data);
+                _boardPowerPrefabDict[mapping.Data.Type] = mapping.Prefab;
+            }
+        }
+
+        #region Methods
+        public void CreateContentDataForNode(TileNode node, TileSetupData setupData)
+        {
+            switch (setupData.contentType)
+            {
+                case PredefinedContentType.SpecificGem:
+                    node.SetContent(new Gem(setupData.gemType));
                     break;
-                case ObstacleType.Ice:
-                    obstacleInstance = new Ice(node, data);
+                case PredefinedContentType.BoardPower:
+                    node.SetContent(new BoardPower(setupData.powerData));
+                    break;
+                case PredefinedContentType.ContentObstacle:
+                    CreateObstacleData(node, setupData.contentObstacleData);
                     break;
             }
 
-            if (obstacleInstance == null) return;
-
-            if (data.PlacementType == ObstaclePlacementType.Content && obstacleInstance is IBoardContent content)
+            if (setupData.overlayObstacleData != null)
             {
-                node.SetContent(content);
+                CreateObstacleData(node, setupData.overlayObstacleData);
             }
-            else if (data.PlacementType == ObstaclePlacementType.Overlay && obstacleInstance is IOverlay overlay)
-            {
-                node.SetOverlay(overlay);
-            }
-
-            GameObject obstacleGO = Object.Instantiate(prefab, position, Quaternion.identity, _contentContainer);
-            obstacleGO.name = $"Obstacle_{data.Type} ({node.GridPosition.x},{node.GridPosition.y})";
-            var view = obstacleGO.GetComponent<ObstacleView>();
-            view.Initialize(obstacleInstance);
         }
 
-        public void CreateBoardPower(TileNode node, Vector3 position, BoardPowerDataSO data)
+        public GameObject CreateVisualForNode(TileNode node, Vector3 startPosition)
         {
-            if (data == null || !_boardPowerPrefabDict.TryGetValue(data.Type, out GameObject prefab)) return;
+            GameObject contentGO = null;
 
-            GameObject powerGO = Object.Instantiate(prefab, position, Quaternion.identity, _contentContainer);
-            powerGO.name = $"Power_{data.Type} ({node.GridPosition.x},{node.GridPosition.y})";
+            if (node.Content != null)
+            {
+                contentGO = CreateVisualForContent(node.Content, startPosition);
+            }
 
-            var power = new BoardPower(data);
-            node.SetContent(power);
+            if (node.Overlay != null)
+            {
+                GameObject overlayGO = CreateVisualForContent(node.Overlay, startPosition);
+                if (contentGO != null)
+                {
+                    overlayGO.transform.SetParent(contentGO.transform);
+                    overlayGO.transform.localPosition = Vector3.zero;
+                }
+            }
+
+            if (contentGO != null)
+            {
+                contentGO.name = $"{node.Content.GetType().Name} ({node.GridPosition.x},{node.GridPosition.y})";
+            }
+
+            return contentGO;
+        }
+
+        private GameObject CreateVisualForContent(object contentModel, Vector3 position)
+        {
+            switch (contentModel)
+            {
+                case Gem gem:
+                    GameObject gemGO = Object.Instantiate(_prefabDB.GenericGemPrefab, position, Quaternion.identity, _contentContainer);
+                    GemView gemView = gemGO.GetComponent<GemView>();
+                    if (gemView != null)
+                    {
+                        gemView.SetSprite(_gemSpriteProvider.GetSprite(gem.Type));
+                        gemView.Initialize(gem);
+                    }
+                    return gemGO;
+
+                case BoardPower power:
+                    if (_boardPowerPrefabDict.TryGetValue(power.Data.Type, out GameObject powerPrefab))
+                    {
+                        GameObject powerGO = Object.Instantiate(powerPrefab, position, Quaternion.identity, _contentContainer);
+                        var powerView = powerGO.GetComponent<BoardPowerView>();
+                        if (powerView != null)
+                            powerView.Initialize(power);
+                        return powerGO;
+                    }
+                    break;
+
+                case Obstacle obstacle:
+                    if (_obstaclePrefabDict.TryGetValue(obstacle.Data.Type, out GameObject obstaclePrefab))
+                    {
+                        Transform parent = obstacle.Data.PlacementType == ObstaclePlacementType.Content ? _contentContainer : _overlayContainer;
+                        GameObject obstacleGO = Object.Instantiate(obstaclePrefab, position, Quaternion.identity, parent);
+                        var obstacleView = obstacleGO.GetComponent<ObstacleView>();
+                        if (obstacleView != null)
+                            obstacleView.Initialize(obstacle);
+                        return obstacleGO;
+                    }
+                    break;
+            }
+            return null;
+        }
+
+        private void CreateObstacleData(TileNode node, ObstacleDataSO data)
+        {
+            if (data == null) return;
+
+            Obstacle obstacleInstance = data.Type switch
+            {
+                ObstacleType.Crate => new Crate(node, data),
+                ObstacleType.Ice => new Ice(node, data),
+                _ => null,
+            };
+
+            if (obstacleInstance == null)
+                return;
+
+            if (data.PlacementType == ObstaclePlacementType.Content)
+            {
+                if (obstacleInstance is IBoardContent content)
+                {
+                    node.SetContent(content);
+                }
+                else
+                {
+                    Debug.LogWarning($"Obstacle '{data.Type}' is defined as 'Content' but its class does not implement IBoardContent.");
+                }
+            }
+            else if (data.PlacementType == ObstaclePlacementType.Overlay)
+            {
+                if (obstacleInstance is IOverlay overlay)
+                {
+                    node.SetOverlay(overlay);
+                }
+                else
+                {
+                    Debug.LogWarning($"Obstacle '{data.Type}' is defined as 'Overlay' but its class does not implement IOverlay.");
+                }
+            }
         }
     }
+    #endregion
 }

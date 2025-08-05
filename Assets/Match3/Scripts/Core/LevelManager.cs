@@ -35,7 +35,7 @@ public class LevelManager : IService, ILevelManager
     }
     public async UniTask LoadAndSetupLevelAsync(int levelIndex)
     {
-        Debug.Log($"Tryin to load level index {levelIndex}");
+        Debug.Log($"Tryinh to load level index {levelIndex}");
         if (!_levelList.IsLevelValid(levelIndex))
         {
             throw new System.ArgumentOutOfRangeException(
@@ -47,26 +47,32 @@ public class LevelManager : IService, ILevelManager
         await _sceneLoader.LoadSceneByIndexAsync(buildIndex);
 
         LevelDataSO levelData = _levelList.LevelDatas[levelIndex];
-        await SpawnBoardAsync(levelData);
-        
-        InitializeLevelRules(levelData);
-
+        await InitializeLevelRules(levelData);
         _publisher.Fire(new LevelLoaded(levelIndex, levelData));
+
+        SpawnBoard(levelData);
     }
 
-    private async UniTask SpawnBoardAsync(LevelDataSO levelData)
+    public async UniTask PlayLevelIntroAnimationAsync()
+    {
+        Debug.Log("$Level Manager is starting the intro animation");
+        await _currentBoard.PlayIntroAnimationAsync();
+    }
+
+    private void SpawnBoard(LevelDataSO levelData)
     {
         if (_currentBoard != null)
             Object.Destroy(_currentBoard.gameObject);
         GameObject boardGO = Object.Instantiate(_boardPrefab);
         _currentBoard = boardGO.GetComponent<Board>();
-        await _currentBoard.CreateBoardAsycnc(levelData);
+        _currentBoard.CreateBoard(levelData);
     }
 
-    private void InitializeLevelRules(LevelDataSO levelData)
+    private UniTask InitializeLevelRules(LevelDataSO levelData)
     {
         RemainingMove = levelData.MaxMove;
         _levelGoals = levelData.CreateRuntimeGoals();
         Debug.Log($"Level {levelData.LevelNumber} rules initialized. Max moves: {levelData.MaxMove}");
+        return UniTask.CompletedTask;
     }
 }

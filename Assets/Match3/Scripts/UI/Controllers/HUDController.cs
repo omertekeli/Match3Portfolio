@@ -19,11 +19,7 @@ namespace Match3.Scripts.UI.Controllers
             _goalPanelController = new GoalPanelController(view.GoalPanelView);
         }
 
-        internal void ToggleHUD(GameState state)
-        {
-            bool shouldShow = state != GameState.MainMenu && state != GameState.Loading;
-            View.SetVisible(shouldShow);
-        }
+        internal void ToggleHUD(bool shouldShow) => View.SetVisible(shouldShow);
         internal void SetupUI(LevelDataSO leveldata, IReadOnlyList<LevelGoalBase> goals)
         {
             View.UpdateRemainingMove(leveldata.MaxMove);

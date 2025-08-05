@@ -73,7 +73,7 @@ MonoBehaviour:
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
   - groundType: 0
-    contentType: 3
+    contentType: 0
     gemType: 1
     powerData: {fileID: 0}
     contentObstacleData: {fileID: 0}
@@ -121,7 +121,7 @@ MonoBehaviour:
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
   - groundType: 0
-    contentType: 1
+    contentType: 0
     gemType: 5
     powerData: {fileID: 0}
     contentObstacleData: {fileID: 0}
@@ -241,8 +241,8 @@ MonoBehaviour:
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
   - groundType: 0
-    contentType: 1
-    gemType: 1
+    contentType: 0
+    gemType: 5
     powerData: {fileID: 0}
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
@@ -253,7 +253,7 @@ MonoBehaviour:
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
   - groundType: 0
-    contentType: 1
+    contentType: 0
     gemType: 2
     powerData: {fileID: 0}
     contentObstacleData: {fileID: 0}
@@ -289,7 +289,7 @@ MonoBehaviour:
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
   - groundType: 0
-    contentType: 1
+    contentType: 0
     gemType: 0
     powerData: {fileID: 0}
     contentObstacleData: {fileID: 0}

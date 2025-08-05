@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using Match3.Scripts.Systems.Level.Base;
-using Match3.Scripts.Systems.Level.Data;
 using System.Collections.Generic;
 
 namespace Match3.Scripts.Core.Interfaces
@@ -9,6 +8,8 @@ namespace Match3.Scripts.Core.Interfaces
     {
         int RemainingMove { get; }
         IReadOnlyList<LevelGoalBase> LevelGoals { get; }
+
+        UniTask PlayLevelIntroAnimationAsync();
         UniTask LoadAndSetupLevelAsync(int levelIndex);
     }
 }

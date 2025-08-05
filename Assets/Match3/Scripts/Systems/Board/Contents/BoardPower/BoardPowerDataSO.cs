@@ -12,8 +12,7 @@ namespace Match3.Scripts.Systems.Board.Contents.BoardPower
 
         [Header("View")]
         [SerializeField] private Sprite _sprite;
-
-        // --- Public Read-Only Properties ---
+        
         public BoardPowerType Type => _type;
         public Sprite Sprite => _sprite;
     }

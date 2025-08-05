@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Match3.Scripts.Configs;
 using Match3.Scripts.Core.Interfaces;
 using Match3.Scripts.Enums;
@@ -21,6 +22,7 @@ namespace Match3.Scripts.Core
         private void Awake()
         {
             TryToRegisterServices();
+            DOTween.Init();
             ServiceLocator.Get<ISceneLoader>().LoadSceneByIndexAsync((int)SceneIndex.MainMenu).Forget();
         }
 

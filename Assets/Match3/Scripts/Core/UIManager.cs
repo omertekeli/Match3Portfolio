@@ -35,13 +35,11 @@ namespace Match3.Scripts.Core
 
         private void OnEnable()
         {
-            _subscriber.Subscribe<GameStateChangedEvent>(OnGameStateChanged);
             _subscriber.Subscribe<LevelLoaded>(OnLevelLoaded);
         }
 
         void OnDisable()
         {
-            _subscriber.Unsubscribe<GameStateChangedEvent>(OnGameStateChanged);
             _subscriber.Unsubscribe<LevelLoaded>(OnLevelLoaded);
         }
 
@@ -84,11 +82,7 @@ namespace Match3.Scripts.Core
         private void OnLevelLoaded(LevelLoaded eventData)
         {
             SetupLevelUI(eventData.LevelData);
-        }
-
-        private void OnGameStateChanged(GameStateChangedEvent eventData)
-        {
-            _hudController.ToggleHUD(eventData.NewState);
+            _hudController.ToggleHUD(true);
         }
 
         #endregion

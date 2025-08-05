@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using Match3.Scripts.Systems.Board.Contents;
 using Match3.Scripts.Systems.Board.Data;
 using Match3.Scripts.Systems.Board.Systems;
 using Match3.Scripts.Systems.Level.Data;
@@ -26,6 +28,7 @@ namespace Match3.Scripts.Systems.Board
 
         #region Data Fields
         private TileNode[,] _grid;
+        private List<GameObject> _visualsToAnimate;
         #endregion
 
         #region Properties
@@ -42,11 +45,11 @@ namespace Match3.Scripts.Systems.Board
         #endregion
 
         #region Unity Methods
-
         private void Awake()
         {
-            _pieceFactory = new PieceFactory(_piecePrefabDB, _boardFactoryConfig.ContentContainer);
+            _pieceFactory = new PieceFactory(_piecePrefabDB, _boardFactoryConfig.ContentContainer, _boardFactoryConfig.OverlayContainer);
             _boardFactory = new BoardFactory(_pieceFactory, _boardFactoryConfig);
+            _visualsToAnimate = new();
         }
         private void OnEnable()
         {
@@ -60,7 +63,7 @@ namespace Match3.Scripts.Systems.Board
         #endregion
 
         #region Main Methods
-        public async UniTask CreateBoardAsycnc(LevelDataSO levelData)
+        public void CreateBoard(LevelDataSO levelData)
         {
             _currentState = BoardState.Initializing;
 
@@ -69,26 +72,80 @@ namespace Match3.Scripts.Systems.Board
             this.Width = levelData.Width;
             this.Height = levelData.Height;
 
-            await _boardFactory.BuildBoardAsync(this, levelData);
+            _visualsToAnimate = _boardFactory.BuildBoard(this, levelData);
+        }
 
-            // TODO: Call the Initial Fill logic here for empty tiles.
-            // This will be handled by a RefillSystem.
-            // await _refillSystem.InitialFillAsync(levelData);
+        public async UniTask PlayIntroAnimationAsync()
+        {
+            if (_visualsToAnimate == null || _visualsToAnimate.Count == 0)
+            {
+                _currentState = BoardState.Idle;
+                return;
+            }
 
+            var animationTasks = new List<UniTask>();
+            float fallDuration = 0.6f;
+            float rowDelay = 0.1f;
+
+            foreach (GameObject pieceGO in _visualsToAnimate)
+            {
+                // Bu, 'BuildBoard'da 'startPosition' olarak ayarlanan mevcut pozisyondur.
+                var view = pieceGO.GetComponent<PieceView>();
+                var model = view.Model;
+                TileNode node = FindNodeForModel(model);
+                if (node == null)
+                    continue;
+
+                var renderer = pieceGO.GetComponentInChildren<SpriteRenderer>();
+                if (renderer == null)
+                    continue;
+
+                Vector3 endPosition = GetWorldPosition(node.GridPosition.x, node.GridPosition.y);
+
+                Sequence sequence = DOTween.Sequence();
+
+                float delay = (node.GridPosition.y) * rowDelay;
+                sequence.SetDelay(delay);
+                sequence.Join(pieceGO.transform.DOMove(endPosition, fallDuration).SetEase(Ease.OutBounce));
+                sequence.Join(renderer.DOFade(1f, fallDuration * 0.25f));
+
+                var sequenceTask = sequence.ToUniTask();
+                animationTasks.Add(sequenceTask);
+            }
+
+            await UniTask.WhenAll(animationTasks);
+
+            _visualsToAnimate.Clear();
             _currentState = BoardState.Idle;
         }
 
-        /// <summary>
-        /// A "setter" method for the factory to assign the created grid back to the Board.
-        /// </summary>
-        public void SetGrid(TileNode[,] newGrid)
+        public void SetGrid(TileNode[,] newGrid) => _grid = newGrid;
+
+        private Vector3 GetWorldPosition(int x, int y)
         {
-            _grid = newGrid;
+            Vector3 localPos = new Vector3(x * _boardFactoryConfig.CellSpacing, y * _boardFactoryConfig.CellSpacing, 0);
+            if (_boardFactoryConfig.BoardContainer != null)
+            {
+                return _boardFactoryConfig.BoardContainer.TransformPoint(localPos);
+            }
+            return localPos;
         }
 
-        /// <summary>
-        /// Destroys all visual GameObjects from the previous board setup.
-        /// </summary>
+        private TileNode FindNodeForModel(object model)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    if (this[x, y]?.Content == model || this[x, y]?.Overlay == model)
+                    {
+                        return this[x, y];
+                    }
+                }
+            }
+            return null;
+        }
+
         private void CleanupBoard()
         {
             foreach (var container in _boardFactoryConfig.CleanableContainers)
@@ -99,7 +156,6 @@ namespace Match3.Scripts.Systems.Board
                 }
             }
         }
-
 
         /*        
         private async void OnSwapIntent(SwapIntentArgs args)
