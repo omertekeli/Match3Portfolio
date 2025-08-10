@@ -776,12 +776,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1661340181}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -18.7051, y: -6.06328, z: -0.12256}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2096424960}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1761388637
 GameObject:
@@ -980,6 +980,7 @@ Transform:
   m_Children:
   - {fileID: 724773593}
   - {fileID: 95054751}
+  - {fileID: 1661340184}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2096424961
@@ -2225,18 +2226,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5406551050438226882, guid: 409ee74848fa43f4f8b002d58f3809a6, type: 3}
-      propertyPath: orthographic
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5406551050438226882, guid: 409ee74848fa43f4f8b002d58f3809a6, type: 3}
-      propertyPath: near clip plane
-      value: -100
-      objectReference: {fileID: 0}
-    - target: {fileID: 5406551050438226882, guid: 409ee74848fa43f4f8b002d58f3809a6, type: 3}
-      propertyPath: orthographic size
-      value: 8.26
-      objectReference: {fileID: 0}
     - target: {fileID: 6461617044238496910, guid: 409ee74848fa43f4f8b002d58f3809a6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -4105,4 +4094,3 @@ SceneRoots:
   - {fileID: 430454589}
   - {fileID: 1873409492}
   - {fileID: 2096424960}
-  - {fileID: 1661340184}

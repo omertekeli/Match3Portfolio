@@ -1,3 +1,5 @@
+using Match3.Scripts.Systems.Board.Data;
+
 namespace Match3.Scripts.Systems.Board.Contents
 {
     /// <summary>
@@ -5,6 +7,7 @@ namespace Match3.Scripts.Systems.Board.Contents
     /// </summary>
     public interface IOverlay
     {
+         public TileNode Node { get; }
         bool IsBlockingMatch();
         bool IsBlockingSwap();
     }

@@ -1,21 +1,23 @@
 using System.Collections.Generic;
+using System.Xml.Schema;
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.CompilerServices;
 using DG.Tweening;
+using Match3.Scripts.Core.Events;
+using Match3.Scripts.Core.Interfaces;
 using Match3.Scripts.Systems.Board.Contents;
 using Match3.Scripts.Systems.Board.Data;
 using Match3.Scripts.Systems.Board.Systems;
 using Match3.Scripts.Systems.Level.Data;
+using TMPro;
+using UnityCoreModules.Services;
+using UnityCoreModules.Services.EventBus;
 using UnityEngine;
 
 namespace Match3.Scripts.Systems.Board
 {
     public class Board : MonoBehaviour
     {
-        #region State
-        private enum BoardState { Initializing, Idle, Busy }
-        private BoardState _currentState;
-        #endregion
-
         #region Inspector References
         [Header("Data & Prefabs")]
         [Tooltip("Reference to the ScriptableObject containing all piece prefabs.")]
@@ -26,9 +28,21 @@ namespace Match3.Scripts.Systems.Board
         [SerializeField] private BoardFactory.Config _boardFactoryConfig;
         #endregion
 
+        #region State
+        private enum BoardState { Initializing, Idle, Busy }
+        private BoardState _currentState;
+        #endregion
+
         #region Data Fields
         private TileNode[,] _grid;
+        private readonly Dictionary<IBoardContent, PieceView> _viewMap = new();
         private List<GameObject> _visualsToAnimate;
+        #endregion
+
+        #region Helper Class
+        private BoardFactory _boardFactory;
+        private IPieceFactory _pieceFactory;
+        private MoveProcessor _moveProcessor;
         #endregion
 
         #region Properties
@@ -39,30 +53,26 @@ namespace Match3.Scripts.Systems.Board
         public TileNode this[Vector2Int coords] => this[coords.x, coords.y];
         #endregion
 
-        #region Helper Classes
-        private BoardFactory _boardFactory;
-        private IPieceFactory _pieceFactory;
-        #endregion
-
         #region Unity Methods
         private void Awake()
         {
+            _moveProcessor = new MoveProcessor(this, ServiceLocator.Get<IEventPublisher>());
             _pieceFactory = new PieceFactory(_piecePrefabDB, _boardFactoryConfig.ContentContainer, _boardFactoryConfig.OverlayContainer);
             _boardFactory = new BoardFactory(_pieceFactory, _boardFactoryConfig);
             _visualsToAnimate = new();
         }
         private void OnEnable()
         {
-            // InputSystem.OnSwapIntent += OnSwapIntent;
+            ServiceLocator.Get<IInputSystem>().SwapRequested += OnSwapRequested;
         }
 
         private void OnDisable()
         {
-            //InputSystem.OnSwapIntent -= OnSwapIntent;
+            ServiceLocator.Get<IInputSystem>().SwapRequested -= OnSwapRequested;
         }
         #endregion
 
-        #region Main Methods
+        #region  Public Methods
         public void CreateBoard(LevelDataSO levelData)
         {
             _currentState = BoardState.Initializing;
@@ -89,10 +99,9 @@ namespace Match3.Scripts.Systems.Board
 
             foreach (GameObject pieceGO in _visualsToAnimate)
             {
-                // Bu, 'BuildBoard'da 'startPosition' olarak ayarlanan mevcut pozisyondur.
                 var view = pieceGO.GetComponent<PieceView>();
                 var model = view.Model;
-                TileNode node = FindNodeForModel(model);
+                TileNode node = FindNodeFromModel(model);
                 if (node == null)
                     continue;
 
@@ -121,6 +130,29 @@ namespace Match3.Scripts.Systems.Board
 
         public void SetGrid(TileNode[,] newGrid) => _grid = newGrid;
 
+        public PieceView GetViewFromContent(IBoardContent model)
+        {
+            return _viewMap.TryGetValue(model, out var view) ? view : null;
+        }
+
+        public void RegisterView(IBoardContent model, PieceView view)
+        {
+            if (model == null || view == null) return;
+            _viewMap[model] = view;
+            view.Initialize(model);
+        }
+
+        public void UnregisterView(IBoardContent model)
+        {
+            if (model != null && _viewMap.ContainsKey(model))
+            {    
+                _viewMap.Remove(model);
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
         private Vector3 GetWorldPosition(int x, int y)
         {
             Vector3 localPos = new Vector3(x * _boardFactoryConfig.CellSpacing, y * _boardFactoryConfig.CellSpacing, 0);
@@ -131,7 +163,7 @@ namespace Match3.Scripts.Systems.Board
             return localPos;
         }
 
-        private TileNode FindNodeForModel(object model)
+        private TileNode FindNodeFromModel(object model)
         {
             for (int y = 0; y < Height; y++)
             {
@@ -157,22 +189,26 @@ namespace Match3.Scripts.Systems.Board
             }
         }
 
-        /*        
-        private async void OnSwapIntent(SwapIntentArgs args)
+        private void OnSwapRequested(SwapRequested args)
         {
-            if (_currentState != BoardState.Idle) return;
-
+            if (_currentState != BoardState.Idle)
+                return;
             try
             {
                 _currentState = BoardState.Busy;
-                await _moveProcessor.ProcessMoveAsync(args.From, args.To);
+                Swap(args).Forget();
             }
             finally
             {
                 _currentState = BoardState.Idle;
             }
         }
-        */
+
+        private async UniTaskVoid Swap(SwapRequested args)
+        {
+            await _moveProcessor.ProcessMoveAsync(args.StartNode, args.EndNode);
+        }
+
         #endregion
     }
 }

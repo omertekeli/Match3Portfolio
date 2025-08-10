@@ -44,6 +44,9 @@ namespace Match3.Scripts.Core
             var sceneLoader = new SceneLoader();
             ServiceLocator.Register<ISceneLoader>(sceneLoader);
 
+            var inputSystem = new InputSystem();
+            ServiceLocator.Register<IInputSystem>(inputSystem);
+
             var levelManager = new LevelManager(
                 _boardPrefab,
                 _levelList,

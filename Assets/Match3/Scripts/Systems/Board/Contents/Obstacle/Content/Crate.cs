@@ -4,7 +4,11 @@ namespace Match3.Scripts.Systems.Board.Contents.Obstacle.Content
 {
     public class Crate : Obstacle, IBoardContent
     {
-        public Crate(TileNode node, ObstacleDataSO data) : base(node, data) { }
+        public TileNode Node { get;  set; }
+        public Crate(TileNode node, ObstacleDataSO data) : base(data)
+        {
+            Node = node;
+        }
 
         public bool CanBeSwapped()
         {

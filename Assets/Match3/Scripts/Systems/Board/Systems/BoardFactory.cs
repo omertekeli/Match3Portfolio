@@ -98,7 +98,7 @@ namespace Match3.Scripts.Systems.Board.Systems
                     else
                     {
                         GemType safeType = GetSafeRandomGemType(grid, x, y, width, levelData);
-                        node.SetContent(new Gem(safeType));
+                        node.SetContent(new Gem(node, safeType));
                     }
                 }
             }
@@ -129,8 +129,8 @@ namespace Match3.Scripts.Systems.Board.Systems
 
                     if (node.Content is Gem || node.Content is BoardPower)
                     {
-                        Vector3 startPosition = new Vector3(x * _config.CellSpacing, (board.Height + 1) * _config.CellSpacing, 0);
-                        GameObject pieceGO = _pieceFactory.CreateVisualForNode(node, startPosition);
+                        Vector3 startPosition = new Vector3(x * _config.CellSpacing, (board.Height) * _config.CellSpacing, 0);
+                        GameObject pieceGO = _pieceFactory.CreateVisualForNode(board, node, startPosition);
                         if (pieceGO)
                         {
                             var renderer = pieceGO.GetComponentInChildren<SpriteRenderer>();
@@ -142,7 +142,7 @@ namespace Match3.Scripts.Systems.Board.Systems
                     }
                     else
                     {
-                        GameObject pieceGO = _pieceFactory.CreateVisualForNode(node, targetPosition);
+                        GameObject pieceGO = _pieceFactory.CreateVisualForNode(board, node, targetPosition);
                     }
                 }
             }

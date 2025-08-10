@@ -48,10 +48,10 @@ namespace Match3.Scripts.Systems.Board.Systems
             switch (setupData.contentType)
             {
                 case PredefinedContentType.SpecificGem:
-                    node.SetContent(new Gem(setupData.gemType));
+                    node.SetContent(new Gem(node, setupData.gemType));
                     break;
                 case PredefinedContentType.BoardPower:
-                    node.SetContent(new BoardPower(setupData.powerData));
+                    node.SetContent(new BoardPower(node, setupData.powerData));
                     break;
                 case PredefinedContentType.ContentObstacle:
                     CreateObstacleData(node, setupData.contentObstacleData);
@@ -64,18 +64,18 @@ namespace Match3.Scripts.Systems.Board.Systems
             }
         }
 
-        public GameObject CreateVisualForNode(TileNode node, Vector3 startPosition)
+        public GameObject CreateVisualForNode(Board board, TileNode node, Vector3 startPosition)
         {
             GameObject contentGO = null;
 
             if (node.Content != null)
             {
-                contentGO = CreateVisualForContent(node.Content, startPosition);
+                contentGO = CreateVisualForContent(board, node.Content, startPosition);
             }
 
             if (node.Overlay != null)
             {
-                GameObject overlayGO = CreateVisualForContent(node.Overlay, startPosition);
+                GameObject overlayGO = CreateVisualForContent(board, node.Overlay, startPosition);
                 if (contentGO != null)
                 {
                     overlayGO.transform.SetParent(contentGO.transform);
@@ -91,7 +91,7 @@ namespace Match3.Scripts.Systems.Board.Systems
             return contentGO;
         }
 
-        private GameObject CreateVisualForContent(object contentModel, Vector3 position)
+        private GameObject CreateVisualForContent(Board board, object contentModel, Vector3 position)
         {
             switch (contentModel)
             {
@@ -101,7 +101,7 @@ namespace Match3.Scripts.Systems.Board.Systems
                     if (gemView != null)
                     {
                         gemView.SetSprite(_gemSpriteProvider.GetSprite(gem.Type));
-                        gemView.Initialize(gem);
+                        board.RegisterView(gem, gemView);
                     }
                     return gemGO;
 
@@ -111,7 +111,7 @@ namespace Match3.Scripts.Systems.Board.Systems
                         GameObject powerGO = Object.Instantiate(powerPrefab, position, Quaternion.identity, _contentContainer);
                         var powerView = powerGO.GetComponent<BoardPowerView>();
                         if (powerView != null)
-                            powerView.Initialize(power);
+                            board.RegisterView(power, powerView);
                         return powerGO;
                     }
                     break;

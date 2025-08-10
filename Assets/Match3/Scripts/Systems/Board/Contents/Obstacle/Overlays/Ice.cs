@@ -1,10 +1,16 @@
 using Match3.Scripts.Systems.Board.Data;
+using UnityEditor.Experimental.GraphView;
 
 namespace Match3.Scripts.Systems.Board.Contents.Obstacle.Overlay
 {
     public class Ice : Obstacle, IOverlay
     {
-        public Ice(TileNode node, ObstacleDataSO data) : base(node, data) { }
+        public TileNode Node { get; private set; }
+
+        public Ice(TileNode node, ObstacleDataSO data) : base(data)
+        {
+            Node = node;
+        }
 
         public override void TakeDamage()
         {
@@ -16,6 +22,6 @@ namespace Match3.Scripts.Systems.Board.Contents.Obstacle.Overlay
         }
 
         public bool IsBlockingMatch() => CurrentHealth > 0;
-        public bool IsBlockingSwap() => false;
+        public bool IsBlockingSwap() => CurrentHealth > 0;
     }
 }

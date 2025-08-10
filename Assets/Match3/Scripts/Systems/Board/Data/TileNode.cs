@@ -33,8 +33,10 @@ namespace Match3.Scripts.Systems.Board.Data
         {
             get
             {
-                if (!HasGem) return false;
-                if (HasOverlay && Overlay.IsBlockingMatch()) return false;
+                if (!HasGem)
+                    return false;
+                if (HasOverlay && Overlay.IsBlockingMatch())
+                    return false;
                 return true;
             }
         }
@@ -42,9 +44,12 @@ namespace Match3.Scripts.Systems.Board.Data
         {
             get
             {
-                if (!IsPlayable || IsEmpty) return false;
-                if (HasOverlay && Overlay.IsBlockingSwap()) return false;
-                if (!Content.CanBeSwapped()) return false;
+                if (!IsPlayable || IsEmpty)
+                    return false;
+                if (HasOverlay && Overlay.IsBlockingSwap())
+                    return false;
+                if (!Content.CanBeSwapped())
+                    return false;
                 return true;
             }
         }
@@ -82,6 +87,17 @@ namespace Match3.Scripts.Systems.Board.Data
                 Debug.LogWarning($"Tile at {GridPosition} already has overlay! Overwriting.");
             }
             Overlay = newOverlay;
+        }
+
+        public void UpdateContent(IBoardContent newContent)
+        {
+            if (newContent == null)
+            {
+                Content = null;
+                return;
+            }
+            Content = newContent;
+            Content.Node = this;
         }
 
         public void ClearOverlay()
