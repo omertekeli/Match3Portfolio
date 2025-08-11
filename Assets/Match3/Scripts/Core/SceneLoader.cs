@@ -4,18 +4,21 @@ using Match3.Scripts.Core.Interfaces;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneLoader : IService, ISceneLoader
+namespace Match3.Scripts.Core
 {
-    public SceneLoader() { }
-
-    public async UniTask LoadSceneByIndexAsync(int sceneIndex)
+    public class SceneLoader : IService, ISceneLoader
     {
-        if (sceneIndex < 0 || sceneIndex >= SceneManager.sceneCountInBuildSettings)
+        public SceneLoader() { }
+
+        public async UniTask LoadSceneByIndexAsync(int sceneIndex)
         {
-            Debug.LogError($"SceneLoader Error: Scene index {sceneIndex} is not valid or not in Build Settings.");
-            return;
+            if (sceneIndex < 0 || sceneIndex >= SceneManager.sceneCountInBuildSettings)
+            {
+                Debug.LogError($"SceneLoader Error: Scene index {sceneIndex} is not valid or not in Build Settings.");
+                return;
+            }
+            await SceneManager.LoadSceneAsync(sceneIndex, LoadSceneMode.Single).ToUniTask();
+            Debug.Log($"SceneLoader: Scene with build index {sceneIndex} loaded asynchronously.");
         }
-        await SceneManager.LoadSceneAsync(sceneIndex, LoadSceneMode.Single).ToUniTask();
-        Debug.Log($"SceneLoader: Scene with build index {sceneIndex} loaded asynchronously.");
     }
 }

@@ -47,7 +47,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84757f3d118babe4d905c99c04263c93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _piecePrefabDB: {fileID: 11400000, guid: 62ebba9fded5bf0409c990159136ae0f, type: 2}
+  _pieceFactoryConfig:
+    PrefabDB: {fileID: 11400000, guid: 62ebba9fded5bf0409c990159136ae0f, type: 2}
+    ContentContainer: {fileID: 2281283459756449410}
+    OverlayContainer: {fileID: 3429992527567529656}
   _boardFactoryConfig:
     CellBackgroundPrefab: {fileID: 8739228731590277098, guid: 845cb7c63183ab340a263d9196714d03, type: 3}
     BoardContainer: {fileID: 6690977720234613332}

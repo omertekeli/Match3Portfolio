@@ -1,3 +1,4 @@
+using UnityCoreModules.Services.ObjectPool;
 using UnityEngine;
 
 namespace Match3.Scripts.Systems.Board.Contents.Obstacle
@@ -6,9 +7,9 @@ namespace Match3.Scripts.Systems.Board.Contents.Obstacle
     {
         [SerializeField] private SpriteRenderer _renderer;
 
-        public void Initialize(Obstacle model)
+        public void Initialize(Obstacle model, IPoolManager poolManager)
         {
-            base.Initialize(model);
+            base.Initialize(model, poolManager);
             _renderer.sprite = model.Data.Sprite;
             // model.OnHealthChanged += OnHealthChanged;
         }

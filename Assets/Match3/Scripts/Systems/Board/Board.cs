@@ -1,17 +1,18 @@
 using System.Collections.Generic;
-using System.Xml.Schema;
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.CompilerServices;
 using DG.Tweening;
+using Match3.Scripts.Configs;
+using Match3.Scripts.Core;
 using Match3.Scripts.Core.Events;
 using Match3.Scripts.Core.Interfaces;
 using Match3.Scripts.Systems.Board.Contents;
+using Match3.Scripts.Systems.Board.Contents.Gem;
 using Match3.Scripts.Systems.Board.Data;
 using Match3.Scripts.Systems.Board.Systems;
 using Match3.Scripts.Systems.Level.Data;
-using TMPro;
 using UnityCoreModules.Services;
 using UnityCoreModules.Services.EventBus;
+using UnityCoreModules.Services.ObjectPool;
 using UnityEngine;
 
 namespace Match3.Scripts.Systems.Board
@@ -19,12 +20,9 @@ namespace Match3.Scripts.Systems.Board
     public class Board : MonoBehaviour
     {
         #region Inspector References
-        [Header("Data & Prefabs")]
-        [Tooltip("Reference to the ScriptableObject containing all piece prefabs.")]
-        [SerializeField] private PiecePrefabDB _piecePrefabDB;
-
         [Header("Factory Configuration")]
         [Tooltip("Settings for the BoardFactory that constructs the board.")]
+        [SerializeField] private PieceFactory.Config _pieceFactoryConfig;
         [SerializeField] private BoardFactory.Config _boardFactoryConfig;
         #endregion
 
@@ -39,10 +37,15 @@ namespace Match3.Scripts.Systems.Board
         private List<GameObject> _visualsToAnimate;
         #endregion
 
+        #region Services
+        private IPoolManager _poolManager;
+        private GemSpriteProvider _gemSpriteProvider;
+        #endregion
+
         #region Helper Class
         private BoardFactory _boardFactory;
         private IPieceFactory _pieceFactory;
-        private MoveProcessor _moveProcessor;
+        private MoveProcessorSystem _moveProcessor;
         #endregion
 
         #region Properties
@@ -56,8 +59,9 @@ namespace Match3.Scripts.Systems.Board
         #region Unity Methods
         private void Awake()
         {
-            _moveProcessor = new MoveProcessor(this, ServiceLocator.Get<IEventPublisher>());
-            _pieceFactory = new PieceFactory(_piecePrefabDB, _boardFactoryConfig.ContentContainer, _boardFactoryConfig.OverlayContainer);
+            _poolManager = ServiceLocator.Get<IPoolManager>();
+            _gemSpriteProvider = ServiceLocator.Get<GemSpriteProvider>();
+            _pieceFactory = new PieceFactory(_pieceFactoryConfig, _poolManager, _gemSpriteProvider);
             _boardFactory = new BoardFactory(_pieceFactory, _boardFactoryConfig);
             _visualsToAnimate = new();
         }
@@ -83,6 +87,7 @@ namespace Match3.Scripts.Systems.Board
             this.Height = levelData.Height;
 
             _visualsToAnimate = _boardFactory.BuildBoard(this, levelData);
+            _moveProcessor = new MoveProcessorSystem(this, ServiceLocator.Get<IEventPublisher>(), _pieceFactory, levelData);
         }
 
         public async UniTask PlayIntroAnimationAsync()
@@ -139,13 +144,13 @@ namespace Match3.Scripts.Systems.Board
         {
             if (model == null || view == null) return;
             _viewMap[model] = view;
-            view.Initialize(model);
+            view.Initialize(model, _poolManager);
         }
 
         public void UnregisterView(IBoardContent model)
         {
             if (model != null && _viewMap.ContainsKey(model))
-            {    
+            {
                 _viewMap.Remove(model);
             }
         }

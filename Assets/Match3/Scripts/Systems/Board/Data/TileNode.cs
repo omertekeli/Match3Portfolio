@@ -91,13 +91,11 @@ namespace Match3.Scripts.Systems.Board.Data
 
         public void UpdateContent(IBoardContent newContent)
         {
-            if (newContent == null)
-            {
-                Content = null;
-                return;
-            }
             Content = newContent;
-            Content.Node = this;
+            if (Content != null)
+            {
+                Content.Node = this;
+            }
         }
 
         public void ClearOverlay()

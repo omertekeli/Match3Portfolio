@@ -10,33 +10,45 @@ using UnityCoreModules.Services;
 using Match3.Scripts.Systems.Board.Contents.Obstacle.Content;
 using Match3.Scripts.Systems.Board.Contents.Obstacle.Overlay;
 using Match3.Scripts.Systems.Board.Contents;
+using UnityCoreModules.Services.ObjectPool;
 
 namespace Match3.Scripts.Systems.Board.Systems
 {
     public class PieceFactory : IPieceFactory
     {
-        #region Fields
-        private readonly PiecePrefabDB _prefabDB;
-        private readonly Transform _contentContainer;
-        private readonly Transform _overlayContainer;
-        private readonly GemSpriteProvider _gemSpriteProvider;
 
+        [System.Serializable]
+        public class Config
+        {
+            public PiecePrefabDB PrefabDB;
+            public Transform ContentContainer;
+            public Transform OverlayContainer;
+        }
+
+        private readonly Config _config;
+
+        #region Services
+        private readonly GemSpriteProvider _gemSpriteProvider;
+        private readonly IPoolManager _poolManager;
+        #endregion
+
+
+        #region Data Fields
         private readonly Dictionary<ObstacleType, GameObject> _obstaclePrefabDict = new();
         private readonly Dictionary<BoardPowerType, GameObject> _boardPowerPrefabDict = new();
         #endregion
 
-        public PieceFactory(PiecePrefabDB prefabDB, Transform contentContainer, Transform overlayContainer)
+        public PieceFactory(Config config, IPoolManager poolManager, GemSpriteProvider gemSpriteProvider)
         {
-            _prefabDB = prefabDB;
-            _contentContainer = contentContainer;
-            _overlayContainer = overlayContainer;
+            _config = config;
             _gemSpriteProvider = ServiceLocator.Get<GemSpriteProvider>();
+            _poolManager = ServiceLocator.Get<IPoolManager>();
 
-            foreach (var mapping in _prefabDB.ObstaclePrefabs)
+            foreach (var mapping in _config.PrefabDB.ObstaclePrefabs)
             {
                 _obstaclePrefabDict[mapping.Data.Type] = mapping.Prefab;
             }
-            foreach (var mapping in _prefabDB.BoardPowerPrefabs)
+            foreach (var mapping in _config.PrefabDB.BoardPowerPrefabs)
             {
                 _boardPowerPrefabDict[mapping.Data.Type] = mapping.Prefab;
             }
@@ -96,7 +108,9 @@ namespace Match3.Scripts.Systems.Board.Systems
             switch (contentModel)
             {
                 case Gem gem:
-                    GameObject gemGO = Object.Instantiate(_prefabDB.GenericGemPrefab, position, Quaternion.identity, _contentContainer);
+                    GameObject gemGO = _poolManager.Get(_config.PrefabDB.GenericGemPrefab);
+                    gemGO.transform.SetParent(_config.ContentContainer);
+                    gemGO.transform.position = position;
                     GemView gemView = gemGO.GetComponent<GemView>();
                     if (gemView != null)
                     {
@@ -108,7 +122,7 @@ namespace Match3.Scripts.Systems.Board.Systems
                 case BoardPower power:
                     if (_boardPowerPrefabDict.TryGetValue(power.Data.Type, out GameObject powerPrefab))
                     {
-                        GameObject powerGO = Object.Instantiate(powerPrefab, position, Quaternion.identity, _contentContainer);
+                        GameObject powerGO = Object.Instantiate(powerPrefab, position, Quaternion.identity, _config.ContentContainer);
                         var powerView = powerGO.GetComponent<BoardPowerView>();
                         if (powerView != null)
                             board.RegisterView(power, powerView);
@@ -119,11 +133,11 @@ namespace Match3.Scripts.Systems.Board.Systems
                 case Obstacle obstacle:
                     if (_obstaclePrefabDict.TryGetValue(obstacle.Data.Type, out GameObject obstaclePrefab))
                     {
-                        Transform parent = obstacle.Data.PlacementType == ObstaclePlacementType.Content ? _contentContainer : _overlayContainer;
+                        Transform parent = obstacle.Data.PlacementType == ObstaclePlacementType.Content ? _config.ContentContainer : _config.OverlayContainer;
                         GameObject obstacleGO = Object.Instantiate(obstaclePrefab, position, Quaternion.identity, parent);
                         var obstacleView = obstacleGO.GetComponent<ObstacleView>();
                         if (obstacleView != null)
-                            obstacleView.Initialize(obstacle);
+                            obstacleView.Initialize(obstacle, _poolManager);
                         return obstacleGO;
                     }
                     break;

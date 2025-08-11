@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _renderer: {fileID: 5609579974803809631}
+  _gemPopVfxPrefab: {fileID: 1650355538894151135, guid: 84786a73e4928454e8c651737cd19c72, type: 3}
 --- !u!114 &8475655979300151747
 MonoBehaviour:
   m_ObjectHideFlags: 0
