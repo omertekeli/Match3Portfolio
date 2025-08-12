@@ -11,6 +11,7 @@ using Match3.Scripts.Systems.Board.Contents.Obstacle.Content;
 using Match3.Scripts.Systems.Board.Contents.Obstacle.Overlay;
 using Match3.Scripts.Systems.Board.Contents;
 using UnityCoreModules.Services.ObjectPool;
+using Match3.Scripts.Enums;
 
 namespace Match3.Scripts.Systems.Board.Systems
 {
@@ -153,7 +154,7 @@ namespace Match3.Scripts.Systems.Board.Systems
             {
                 ObstacleType.Crate => new Crate(node, data),
                 ObstacleType.Ice => new Ice(node, data),
-                _ => null,
+                _ => null
             };
 
             if (obstacleInstance == null)

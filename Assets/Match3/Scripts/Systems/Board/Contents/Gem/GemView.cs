@@ -9,7 +9,6 @@ namespace Match3.Scripts.Systems.Board.Contents.Gem
     {
         [SerializeField] private SpriteRenderer _renderer;
         [SerializeField] private GameObject _gemPopVfxPrefab;
-        private float _popAnimDuration = 0.3f;
 
         public void Initialize(Gem model, IPoolManager poolManager)
         {
@@ -24,12 +23,12 @@ namespace Match3.Scripts.Systems.Board.Contents.Gem
             }
         }
 
-        public override async UniTask PlayClearAnimation(float duration = 0.2F)
+        public override async UniTask PlayClearAnimation(float duration = 0.3f)
         {
             var currentPosition = gameObject.transform.position;
             Sequence sequence = DOTween.Sequence();
-            sequence.Append(transform.DOScale(Vector3.zero, _popAnimDuration).SetEase(Ease.InBack));
-            sequence.Join(_renderer.DOFade(0f, _popAnimDuration));
+            sequence.Append(transform.DOScale(Vector3.zero, duration).SetEase(Ease.InBack));
+            sequence.Join(_renderer.DOFade(0f, duration));
             PlayVFX(currentPosition);
             await sequence.ToUniTask();
 
@@ -53,6 +52,22 @@ namespace Match3.Scripts.Systems.Board.Contents.Gem
             {
                 particleSystem.Play();
 
+            }
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("HoleTrigger"))
+            {
+                _renderer.color = new Color(1f, 1f, 1f, 0f);
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (other.CompareTag("HoleTrigger"))
+            {
+                _renderer.color = Color.white;
             }
         }
     }

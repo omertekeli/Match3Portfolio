@@ -51,6 +51,7 @@ namespace Match3.Scripts.Systems.Board
         #region Properties
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public BoardFactory.Config BoardFactoryConfig => _boardFactoryConfig;
 
         public TileNode this[int x, int y] => (x >= 0 && x < Width && y >= 0 && y < Height) ? _grid[x, y] : null;
         public TileNode this[Vector2Int coords] => this[coords.x, coords.y];
@@ -155,10 +156,7 @@ namespace Match3.Scripts.Systems.Board
             }
         }
 
-        #endregion
-
-        #region Private Methods
-        private Vector3 GetWorldPosition(int x, int y)
+        public Vector3 GetWorldPosition(int x, int y)
         {
             Vector3 localPos = new Vector3(x * _boardFactoryConfig.CellSpacing, y * _boardFactoryConfig.CellSpacing, 0);
             if (_boardFactoryConfig.BoardContainer != null)
@@ -168,6 +166,18 @@ namespace Match3.Scripts.Systems.Board
             return localPos;
         }
 
+        public Vector3 GetWorldPosition(float x, float y)
+        {
+            Vector3 localPos = new Vector3(x * _boardFactoryConfig.CellSpacing, y * _boardFactoryConfig.CellSpacing, 0);
+            if (_boardFactoryConfig.BoardContainer != null)
+            {
+                return _boardFactoryConfig.BoardContainer.TransformPoint(localPos);
+            }
+            return localPos;
+        }
+        #endregion
+
+        #region Private Methods
         private TileNode FindNodeFromModel(object model)
         {
             for (int y = 0; y < Height; y++)

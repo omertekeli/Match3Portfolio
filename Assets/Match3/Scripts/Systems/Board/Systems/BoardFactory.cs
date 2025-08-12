@@ -122,7 +122,12 @@ namespace Match3.Scripts.Systems.Board.Systems
                         continue;
 
                     Vector3 targetPosition = new Vector3(x * _config.CellSpacing, y * _config.CellSpacing, 0);
-                    Object.Instantiate(_config.CellBackgroundPrefab, targetPosition, Quaternion.identity, _config.BackgroundContainer);
+                    GameObject cellGO = Object.Instantiate(_config.CellBackgroundPrefab, targetPosition, Quaternion.identity, _config.BackgroundContainer);
+                    var cellView = cellGO.GetComponent<CellView>();
+                    if (cellView != null)
+                    {
+                        cellView.Initialize(node.Behavior);
+                    }
 
                     if (node.IsEmpty)
                         continue;
