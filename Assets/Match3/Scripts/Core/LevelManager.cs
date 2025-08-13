@@ -7,6 +7,7 @@ using Match3.Scripts.Systems.Level.Base;
 using System.Collections.Generic;
 using Match3.Scripts.Core.Events;
 using Match3.Scripts.Core.Interfaces;
+using UnityCoreModules.Services;
 
 namespace Match3.Scripts.Core
 {
@@ -60,6 +61,22 @@ namespace Match3.Scripts.Core
             await _currentBoard.PlayIntroAnimationAsync();
         }
 
+        public void DecrementMove()
+        {
+            if (RemainingMove <= 0)
+                return;
+
+            Debug.Log($" Fire new Remaning move: {RemainingMove}");
+            RemainingMove--;
+            _publisher.Fire(new MoveCountUpdated(RemainingMove));
+
+            var goalSystem = ServiceLocator.Get<GoalSystem>();
+            if (RemainingMove <= 0 && !goalSystem.IsAllGoalsCompleted())
+            {
+                _publisher.Fire(new LevelEnd(false));
+            }
+        }
+
         private void SpawnBoard(LevelDataSO levelData)
         {
             if (_currentBoard != null)
@@ -73,6 +90,8 @@ namespace Match3.Scripts.Core
         {
             RemainingMove = levelData.MaxMove;
             _levelGoals = levelData.CreateRuntimeGoals();
+            ServiceLocator.Get<GoalSystem>().Initialize(_levelGoals);
+            ServiceLocator.Get<IScoreSystem>().Initialize();
             Debug.Log($"Level {levelData.LevelNumber} rules initialized. Max moves: {levelData.MaxMove}");
             return UniTask.CompletedTask;
         }

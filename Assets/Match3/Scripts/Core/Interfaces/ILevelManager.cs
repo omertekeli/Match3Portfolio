@@ -11,5 +11,6 @@ namespace Match3.Scripts.Core.Interfaces
 
         UniTask PlayLevelIntroAnimationAsync();
         UniTask LoadAndSetupLevelAsync(int levelIndex);
+        void DecrementMove();
     }
 }

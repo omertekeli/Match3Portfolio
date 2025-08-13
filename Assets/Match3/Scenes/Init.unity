@@ -288,7 +288,7 @@ MonoBehaviour:
   - {fileID: 2096424961}
   _gemSpriteLibrary: {fileID: 11400000, guid: 366f7070788e8244bacc996f79581c2a, type: 2}
   _levelList: {fileID: 11400000, guid: 67735e1ceb3e7b94c9d8b78c383cae88, type: 2}
-  _genericGemPrefab: {fileID: 4752002983706128665, guid: 8fb0b8df7fd182f43b7b56a62384e757, type: 3}
+  _piecePrefabDB: {fileID: 11400000, guid: 62ebba9fded5bf0409c990159136ae0f, type: 2}
   _gemPopVFXPrefab: {fileID: 1650355538894151135, guid: 84786a73e4928454e8c651737cd19c72, type: 3}
   _gemPoolSize: 50
   _gemPopVfxPoolSize: 10
@@ -488,6 +488,8 @@ MonoBehaviour:
   _remainingMovesText: {fileID: 6473962903466363923}
   _scoreText: {fileID: 6266087912788585248}
   _goalPanelView: {fileID: 9134229859096297735}
+  _progressBarSlider: {fileID: 1000394414908499412}
+  _barAnimationDuration: 0.3
 --- !u!1 &835835233
 GameObject:
   m_ObjectHideFlags: 0
@@ -1734,7 +1736,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1000394416073432091
 RectTransform:
   m_ObjectHideFlags: 0

@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Match3.Scripts.Enums;
 using Match3.Scripts.Systems.Board.Contents;
+using Match3.Scripts.Systems.Board.Contents.Gem;
 using Match3.Scripts.Systems.Board.Data;
+using Match3.Scripts.Systems.Board.Events;
 using Match3.Scripts.Systems.Level.Data;
 using UnityCoreModules.Services.EventBus;
 using UnityEngine;
@@ -66,7 +69,7 @@ namespace Match3.Scripts.Systems.Board.Systems
             var tasks = new List<UniTask>();
 
             // TODO: Overlay checking
-
+            var clearedPieces = new Dictionary<GemType, int>();
             foreach (var node in matchedNodes)
             {
                 if (node.Content != null)
@@ -77,13 +80,21 @@ namespace Match3.Scripts.Systems.Board.Systems
                         tasks.Add(view.PlayClearAnimation());
                     }
 
+                    if (node.Content is Gem gem)
+                    {
+                        if (clearedPieces.ContainsKey(gem.Type))
+                            clearedPieces[gem.Type]++;
+                        else
+                            clearedPieces[gem.Type] = 1;
+                    }
+
                     Debug.Log($"Clear at position: {node.Content.Node.GridPosition}");
                     _board.UnregisterView(node.Content);
                     node.UpdateContent(null);
                 }
             }
 
-            // _publisher.Fire(new PiecesClearedEvent(matchedNodes));
+            _publisher.Fire(new PiecesCleared(clearedPieces));
             await UniTask.WhenAll(tasks);
         }
 

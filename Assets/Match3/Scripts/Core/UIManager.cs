@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Match3.Scripts.Core.Events;
 using Match3.Scripts.Core.Interfaces;
+using Match3.Scripts.Systems.Board.Events;
 using Match3.Scripts.Systems.Level.Data;
 using Match3.Scripts.UI;
 using Match3.Scripts.UI.Controllers;
@@ -36,25 +37,31 @@ namespace Match3.Scripts.Core
         private void OnEnable()
         {
             _subscriber.Subscribe<LevelLoaded>(OnLevelLoaded);
+            _subscriber.Subscribe<MoveCountUpdated>(OnMoveCountUpdated);
+            _subscriber.Subscribe<PiecesCleared>(OnPiecesCleared);
+            _subscriber.Subscribe<GoalUpdated>(OnGoalProgressUpdated);
+            _subscriber.Subscribe<ScoreUpdated>(OnScoreUpdated);
+        }
+
+        private void OnPiecesCleared(PiecesCleared eventData)
+        {
+            _hudController.UpdateGoals(eventData.ClearedPieces);
         }
 
         void OnDisable()
         {
             _subscriber.Unsubscribe<LevelLoaded>(OnLevelLoaded);
+            _subscriber.Unsubscribe<MoveCountUpdated>(OnMoveCountUpdated);
+            _subscriber.Unsubscribe<PiecesCleared>(OnPiecesCleared);
+            _subscriber.Unsubscribe<GoalUpdated>(OnGoalProgressUpdated);
+            _subscriber.Unsubscribe<ScoreUpdated>(OnScoreUpdated);
         }
-
         #endregion
 
         #region Methods
-        public void RegisterLevelMenu(LevelMenu menu)
-        {
-            menu.LevelSelected += OnLevelSelection;
-        }
+        public void RegisterLevelMenu(LevelMenu menu) => menu.LevelSelected += OnLevelSelection;
 
-        public void UnregisterLevelMenu(LevelMenu menu)
-        {
-            menu.LevelSelected -= OnLevelSelection;
-        }
+        public void UnregisterLevelMenu(LevelMenu menu) => menu.LevelSelected -= OnLevelSelection;
 
         public void SetupLevelUI(LevelDataSO levelData)
         {
@@ -85,6 +92,22 @@ namespace Match3.Scripts.Core
             _hudController.ToggleHUD(true);
         }
 
+        private void OnMoveCountUpdated(MoveCountUpdated eventData)
+        {
+            Debug.Log($"Update Remaning Move: {eventData.RemaningMove}");
+            _hudController.UpdateRemainingMove(eventData.RemaningMove);
+        }
+
+        private void OnGoalProgressUpdated(GoalUpdated eventData)
+        {
+            _hudController.UpdateProgressBar(eventData.TotalProgress);
+        }
+
+        private void OnScoreUpdated(ScoreUpdated eventData)
+        {
+            Debug.Log($"Update Score: {eventData.CurrentScore}");
+            _hudController.UpdateScore(eventData.CurrentScore);
+        }
         #endregion
     }
 }

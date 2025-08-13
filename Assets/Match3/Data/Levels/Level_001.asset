@@ -356,5 +356,5 @@ MonoBehaviour:
     overlayObstacleData: {fileID: 0}
   _music: {fileID: 0}
   _levelGoals:
-  - {fileID: 11400000, guid: f26d02b0c0492304eb95773d807367a0, type: 2}
-  - {fileID: 11400000, guid: c551dd8e141bab94393225958a804d48, type: 2}
+  - {fileID: 11400000, guid: cb5b6c0464b1ee2419c9e12fa170f23c, type: 2}
+  - {fileID: 11400000, guid: e8b6573a3c3f7a148bb4bbb6bff7dcca, type: 2}

@@ -10,6 +10,7 @@ using Match3.Scripts.Systems.Board.Contents.Gem;
 using Match3.Scripts.Systems.Board.Data;
 using Match3.Scripts.Systems.Board.Systems;
 using Match3.Scripts.Systems.Level.Data;
+using NUnit.Framework;
 using UnityCoreModules.Services;
 using UnityCoreModules.Services.EventBus;
 using UnityCoreModules.Services.ObjectPool;
@@ -204,26 +205,34 @@ namespace Match3.Scripts.Systems.Board
             }
         }
 
-        private void OnSwapRequested(SwapRequested args)
+        private async void OnSwapRequested(SwapRequested args)
         {
             if (_currentState != BoardState.Idle)
                 return;
+
+            ServiceLocator.Get<ILevelManager>().DecrementMove();
+
+            bool moveWasSuccessful = false;
             try
             {
                 _currentState = BoardState.Busy;
-                Swap(args).Forget();
+                moveWasSuccessful = await SwapAsync(args);
             }
             finally
             {
                 _currentState = BoardState.Idle;
+                if (moveWasSuccessful)
+                {
+                    //ServiceLocator.Get<ILevelManager>().DecrementMove();
+                }
             }
         }
 
-        private async UniTaskVoid Swap(SwapRequested args)
+        private async UniTask<bool> SwapAsync(SwapRequested args)
         {
-            await _moveProcessor.ProcessMoveAsync(args.StartNode, args.EndNode);
+            var successful = await _moveProcessor.ProcessMoveAsync(args.StartNode, args.EndNode);
+            return successful;
         }
-
         #endregion
     }
 }

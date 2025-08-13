@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Match3.Scripts.Enums;
 using Match3.Scripts.Systems.Level.Base;
 using Match3.Scripts.Systems.Level.Goals;
 using Match3.Scripts.UI.Base;
@@ -27,11 +28,23 @@ namespace Match3.Scripts.UI.Views
                     _ => null
                 };
 
-                if (!prefabToUse) continue;
+                if (!prefabToUse)
+                    continue;
 
                 var slot = Instantiate(prefabToUse, _gemSlotContainer);
                 slot.Set(goal);
                 _spawnedSlots.Add(slot);
+            }
+        }
+
+        internal void UpdateGoals(Dictionary<GemType, int> clearedPieces)
+        {
+            foreach (var item in clearedPieces)
+            {
+                foreach (var slot in _spawnedSlots)
+                {
+                    slot.UpdateCount(item.Key, item.Value);
+                }
             }
         }
 

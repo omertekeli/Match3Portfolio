@@ -7,7 +7,7 @@ using Match3.Scripts.UI.Views;
 
 namespace Match3.Scripts.UI.Controllers
 {
-    public class HUDController: UIController<HUDView>
+    public class HUDController : UIController<HUDView>
     {
         #region Fields
 
@@ -22,9 +22,14 @@ namespace Match3.Scripts.UI.Controllers
         internal void ToggleHUD(bool shouldShow) => View.SetVisible(shouldShow);
         internal void SetupUI(LevelDataSO leveldata, IReadOnlyList<LevelGoalBase> goals)
         {
-            View.UpdateRemainingMove(leveldata.MaxMove);
-            View.UpdateScore(0);
+            UpdateRemainingMove(leveldata.MaxMove);
+            UpdateScore(0);
             _goalPanelController.SetupGoals(goals);
         }
+
+        internal void UpdateRemainingMove(int remainingMove) => View.UpdateRemainingMove(remainingMove);
+        internal void UpdateScore(int score) => View.UpdateScore(score);
+        internal void UpdateProgressBar(float totalProgress) => View.UpdateProgressBar(totalProgress);
+        internal void UpdateGoals(Dictionary<GemType, int> clearedPieces) => _goalPanelController.UpdateGoals(clearedPieces);
     }
 }

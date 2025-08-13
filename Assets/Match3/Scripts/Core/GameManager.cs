@@ -18,12 +18,18 @@ namespace Match3.Scripts.Core
         private ISceneLoader _sceneLoader;
         #endregion
 
+        #region Properties
+        public GameState GameState => _currentState;
+        #endregion
+
         private void Awake()
         {
+            _currentState = GameState.Loading;
             _publisher = ServiceLocator.Get<IEventPublisher>();
             _uiManager = ServiceLocator.Get<UIManager>();
             _levelManager = ServiceLocator.Get<ILevelManager>();
             _sceneLoader = ServiceLocator.Get<ISceneLoader>();
+            RequestMainMenu().Forget();
         }
 
         public void RequestStartLevel(int levelIndex)
@@ -31,9 +37,12 @@ namespace Match3.Scripts.Core
             LoadLevelWorkflowAsync(levelIndex).Forget();
         }
 
-        public void RequestReturnToMainMenu()
+        public async UniTaskVoid RequestMainMenu()
         {
-            _sceneLoader.LoadSceneByIndexAsync((int)SceneIndex.MainMenu).Forget();
+            if (_currentState == GameState.MainMenu)
+                return;
+            await _sceneLoader.LoadSceneByIndexAsync((int)SceneIndex.MainMenu);
+            SetState(GameState.MainMenu);
         }
 
         private async UniTaskVoid LoadLevelWorkflowAsync(int levelIndex)
@@ -55,14 +64,15 @@ namespace Match3.Scripts.Core
                 Debug.LogError($"Failed to transition to state {GameState.Gameplay}. Error: {e.Message}\n{e.StackTrace}");
                 if (_currentState != GameState.MainMenu)
                 {
-                    RequestReturnToMainMenu();
+                    RequestMainMenu().Forget();
                 }
             }
         }
 
         private void SetState(GameState newState)
         {
-            if (_currentState == newState) return;
+            if (_currentState == newState)
+                return;
             Debug.Log($"State changing to {newState}");
             _currentState = newState;
             _publisher.Fire(new GameStateChangedEvent(newState));

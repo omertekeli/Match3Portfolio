@@ -3,6 +3,7 @@ using DG.Tweening;
 using Match3.Scripts.Configs;
 using Match3.Scripts.Core.Interfaces;
 using Match3.Scripts.Enums;
+using Match3.Scripts.Systems.Board.Data;
 using UnityCoreModules.Services;
 using UnityCoreModules.Services.EventBus;
 using UnityCoreModules.Services.ObjectPool;
@@ -22,7 +23,7 @@ namespace Match3.Scripts.Core
 
         #region Pool
         [Header("Pool Prefabs")]
-        [SerializeField] private GameObject _genericGemPrefab;
+        [SerializeField] private PiecePrefabDB _piecePrefabDB;
         [SerializeField] private GameObject _gemPopVFXPrefab;
 
         [Header("Initial Pool Sizes")]
@@ -35,14 +36,15 @@ namespace Match3.Scripts.Core
             TryToRegisterServices();
             CreatePools();
             DOTween.Init();
-            ServiceLocator.Get<ISceneLoader>().LoadSceneByIndexAsync((int)SceneIndex.MainMenu).Forget();
         }
 
         private void CreatePools()
         {
             var poolManager = ServiceLocator.Get<IPoolManager>();
-            poolManager.CreatePool(_genericGemPrefab, _gemPoolSize);
+            poolManager.CreatePool(_piecePrefabDB.GenericGemPrefab, _gemPoolSize);
             poolManager.CreatePool(_gemPopVFXPrefab, _gemPopVfxPoolSize);
+            //TODO: create pool for boardPowers
+            //TODO: create pool for obstacles
         }
 
         private void TryToRegisterServices()
@@ -76,6 +78,12 @@ namespace Match3.Scripts.Core
                 ServiceLocator.Get<IEventPublisher>()
             );
             ServiceLocator.Register<ILevelManager>(levelManager);
+
+            var goalSystem = new GoalSystem();
+            ServiceLocator.Register<GoalSystem>(goalSystem);
+
+            var scoreSystem = new ScoreSystem(eventBus);
+            ServiceLocator.Register<IScoreSystem>(scoreSystem);
         }
 
         private void RegisterMonoServices()
