@@ -290,15 +290,15 @@ MonoBehaviour:
     overlayObstacleData: {fileID: 0}
   - groundType: 0
     contentType: 0
-    gemType: 0
+    gemType: 2
     powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
+    contentObstacleData: {fileID: 11400000, guid: 1b12a1e42ba9ca247920019c80f1ae8a, type: 2}
     overlayObstacleData: {fileID: 0}
   - groundType: 0
     contentType: 0
-    gemType: 0
+    gemType: 5
     powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
+    contentObstacleData: {fileID: 11400000, guid: ae878b49205dc064dbd7f775af2f5462, type: 2}
     overlayObstacleData: {fileID: 0}
   - groundType: 0
     contentType: 0

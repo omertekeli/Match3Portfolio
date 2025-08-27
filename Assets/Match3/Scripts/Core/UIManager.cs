@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Match3.Scripts.Core.Events;
 using Match3.Scripts.Core.Interfaces;
+using Match3.Scripts.Enums;
 using Match3.Scripts.Systems.Board.Events;
 using Match3.Scripts.Systems.Level.Data;
-using Match3.Scripts.UI;
+using Match3.Scripts.UI.Base;
+using Match3.Scripts.UI.Components;
 using Match3.Scripts.UI.Controllers;
 using Match3.Scripts.UI.Views;
 using UnityCoreModules.Services;
@@ -16,21 +19,33 @@ namespace Match3.Scripts.Core
     public class UIManager : MonoBehaviour, IService
     {
         #region Fields
+        [Header("Canvas")]
+        [SerializeField] private Transform _hudCanvas;
+
+        [Header("Views")]
         [SerializeField] private HUDView _hudView;
         [SerializeField] private FadeView _fadeView;
+
+        [Header("Popups")]
+        [SerializeField] private List<UIPanel> _popupPrefabs;
+        private Dictionary<PopupType, UIPanel> _popupPrefabDict;
+        private UIPanel _currentPopup;
+
         [SerializeField] private float _extraLoadingHoldDuration = 1f;
 
         private HUDController _hudController;
         private FadeController _fadeController;
         private IEventSubscriber _subscriber;
+        private IAudioManager _audioManager;
         #endregion
 
-        #region Unity Methods
+
+        #region Methods
         private void Awake()
         {
-            _hudController = new HUDController(_hudView);
-            _fadeController = new FadeController(_fadeView);
-            _subscriber = ServiceLocator.Get<IEventSubscriber>();
+            SetPopupDictionary();
+            SetServices();
+            CreateControllers();
             DontDestroyOnLoad(gameObject);
         }
 
@@ -43,11 +58,6 @@ namespace Match3.Scripts.Core
             _subscriber.Subscribe<ScoreUpdated>(OnScoreUpdated);
         }
 
-        private void OnPiecesCleared(PiecesCleared eventData)
-        {
-            _hudController.UpdateGoals(eventData.ClearedPieces);
-        }
-
         void OnDisable()
         {
             _subscriber.Unsubscribe<LevelLoaded>(OnLevelLoaded);
@@ -56,9 +66,7 @@ namespace Match3.Scripts.Core
             _subscriber.Unsubscribe<GoalUpdated>(OnGoalProgressUpdated);
             _subscriber.Unsubscribe<ScoreUpdated>(OnScoreUpdated);
         }
-        #endregion
 
-        #region Methods
         public void RegisterLevelMenu(LevelMenu menu) => menu.LevelSelected += OnLevelSelection;
 
         public void UnregisterLevelMenu(LevelMenu menu) => menu.LevelSelected -= OnLevelSelection;
@@ -81,10 +89,132 @@ namespace Match3.Scripts.Core
             }
         }
 
-        private void OnLevelSelection(int levelIndex)
+        public async UniTaskVoid ShowPopupAsync(PopupType type)
         {
-            ServiceLocator.Get<GameManager>().RequestStartLevel(levelIndex);
+            if (_currentPopup != null)
+                return;
+
+            if (_popupPrefabDict.TryGetValue(type, out UIPanel prefab))
+            {
+                _currentPopup = Instantiate(prefab, _hudCanvas);
+                switch (type)
+                {
+                    case PopupType.Pause:
+                        SetupPausePopup();
+                        break;
+                    case PopupType.Result:
+                        SetupResultPopup();
+                        break;
+                }
+                await _currentPopup.ShowAsync();
+            }
         }
+
+        public async UniTask HideCurrentPopupAsync()
+        {
+            if (_currentPopup == null)
+                return;
+
+            UIPanel popupToHide = _currentPopup;
+            _currentPopup = null;
+
+            if (popupToHide is PausePopup pausePopup)
+            {
+                pausePopup.ActionRequested -= HandlePopupAction;
+                pausePopup.MusicToggle -= OnMusicToggle;
+                pausePopup.SfxToggle -= OnSfxToggle;
+            }
+            else if (popupToHide is ResultPopup resultPopup)
+            {
+                resultPopup.ActionRequested -= HandlePopupAction;
+            }
+
+            await popupToHide.HideAsync();
+            Destroy(popupToHide.gameObject);
+        }
+
+        private void CreateControllers()
+        {
+            _hudController = new HUDController(_hudView, this, _audioManager);
+            _fadeController = new FadeController(_fadeView);
+        }
+
+        private void SetServices()
+        {
+            _audioManager = ServiceLocator.Get<IAudioManager>();
+            _subscriber = ServiceLocator.Get<IEventSubscriber>();
+        }
+
+        private void SetPopupDictionary()
+        {
+            _popupPrefabDict = new Dictionary<PopupType, UIPanel>();
+            foreach (var prefab in _popupPrefabs)
+            {
+                _popupPrefabDict[prefab.Type] = prefab;
+            }
+        }
+
+        private void SetupResultPopup()
+        {
+            if (_currentPopup is not ResultPopup resultPopup)
+                return;
+
+            resultPopup.Setup(ServiceLocator.Get<IScoreSystem>().CurrentScore);
+            resultPopup.ActionRequested += HandlePopupAction;
+        }
+
+        private void SetupPausePopup()
+        {
+            if (_currentPopup is not PausePopup pausePopup)
+                return;
+
+            pausePopup.Setup(_audioManager.IsMusicEnabled, _audioManager.IsSfxEnabled);
+            pausePopup.ActionRequested += HandlePopupAction;
+            pausePopup.MusicToggle += OnMusicToggle;
+            pausePopup.SfxToggle += OnSfxToggle;
+        }
+
+        private void OnMusicToggle(bool shoulEnable)
+        {
+            _audioManager.PlaySfx(SfxType.ButtonClick);
+            _audioManager.SetMusicEnabled(shoulEnable);
+        }
+
+        private void OnSfxToggle(bool shoulEnable)
+        {
+            _audioManager.PlaySfx(SfxType.ButtonClick);
+            _audioManager.SetSfxEnabled(shoulEnable);
+        }
+
+        private void HandlePopupAction(PopupActionType actionType)
+        {
+            _audioManager.PlaySfx(SfxType.ButtonClick);
+            switch (actionType)
+            {
+                case PopupActionType.Resume:
+                    HideCurrentPopupAsync().Forget();
+                    break;
+
+                case PopupActionType.Replay:
+                    HideCurrentPopupAsync().Forget();
+                    ServiceLocator.Get<GameManager>().RequestRestartLevel();
+                    break;
+
+                case PopupActionType.MainMenu:
+                    HideCurrentPopupAsync().Forget();
+                    ServiceLocator.Get<GameManager>().RequestReturnMainMenu();
+                    _hudController.ToggleHUD(false);
+                    break;
+
+                case PopupActionType.Quit:
+                    Application.Quit();
+                    break;
+            }
+        }
+
+        private void OnPiecesCleared(PiecesCleared eventData) => _hudController.UpdateGoals(eventData.ClearedPieces);
+
+        private void OnLevelSelection(int levelIndex) => ServiceLocator.Get<GameManager>().RequestStartLevel(levelIndex);
 
         private void OnLevelLoaded(LevelLoaded eventData)
         {
@@ -98,10 +228,7 @@ namespace Match3.Scripts.Core
             _hudController.UpdateRemainingMove(eventData.RemaningMove);
         }
 
-        private void OnGoalProgressUpdated(GoalUpdated eventData)
-        {
-            _hudController.UpdateProgressBar(eventData.TotalProgress);
-        }
+        private void OnGoalProgressUpdated(GoalUpdated eventData) => _hudController.UpdateProgressBar(eventData.TotalProgress);
 
         private void OnScoreUpdated(ScoreUpdated eventData)
         {

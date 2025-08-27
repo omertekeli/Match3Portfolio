@@ -9,7 +9,7 @@ using UnityCoreModules.Services;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Match3.Scripts.UI
+namespace Match3.Scripts.UI.Components
 {
     public class GemGoalSlotUI : GoalSlotUIBase
     {

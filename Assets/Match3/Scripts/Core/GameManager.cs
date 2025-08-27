@@ -1,4 +1,7 @@
+using System;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.CompilerServices;
 using Match3.Scripts.Core.Events;
 using Match3.Scripts.Core.Interfaces;
 using Match3.Scripts.Enums;
@@ -12,7 +15,7 @@ namespace Match3.Scripts.Core
     {
         #region Fields
         private GameState _currentState;
-        private IEventPublisher _publisher;
+        private IEventBus _eventBus;
         private UIManager _uiManager;
         private ILevelManager _levelManager;
         private ISceneLoader _sceneLoader;
@@ -22,34 +25,94 @@ namespace Match3.Scripts.Core
         public GameState GameState => _currentState;
         #endregion
 
+        #region Methods
         private void Awake()
         {
             _currentState = GameState.Loading;
-            _publisher = ServiceLocator.Get<IEventPublisher>();
+            _eventBus = ServiceLocator.Get<IEventBus>();
             _uiManager = ServiceLocator.Get<UIManager>();
             _levelManager = ServiceLocator.Get<ILevelManager>();
             _sceneLoader = ServiceLocator.Get<ISceneLoader>();
-            RequestMainMenu().Forget();
+            Init().Forget();
+            DontDestroyOnLoad(gameObject);
+        }
+
+        void OnEnable()
+        {
+            Debug.Log("Game Manager is enabled");
+            _eventBus.Subscribe<LevelEnd>(OnLevelEnd);
+        }
+
+        void OnDisable()
+        {
+            Debug.Log("Game Manager is disabled");
+            _eventBus.Unsubscribe<LevelEnd>(OnLevelEnd);
         }
 
         public void RequestStartLevel(int levelIndex)
         {
+            if (_currentState != GameState.MainMenu)
+                return;
+            if (_currentState == GameState.Loading)
+                return;
             LoadLevelWorkflowAsync(levelIndex).Forget();
         }
 
-        public async UniTaskVoid RequestMainMenu()
+        public void RequestRestartLevel()
         {
-            if (_currentState == GameState.MainMenu)
+            if (_currentState == GameState.Loading)
                 return;
+            RestartLevelAsync().Forget();
+        }
+
+        public void RequestReturnMainMenu()
+        {
+            if (_currentState == GameState.Loading)
+                return;
+            ReturnMainMenuAsync().Forget();
+        }
+
+        private async UniTaskVoid Init()
+        {
             await _sceneLoader.LoadSceneByIndexAsync((int)SceneIndex.MainMenu);
-            SetState(GameState.MainMenu);
+            _currentState = GameState.MainMenu;
+        }
+
+        private async UniTaskVoid RestartLevelAsync()
+        {
+            try
+            {
+                SetState(GameState.Loading);
+                await _uiManager.PlayLoadingTransitionAsync(true);
+                await _levelManager.RestartLevelAsync();
+                await _uiManager.PlayLoadingTransitionAsync(false);
+                await _levelManager.PlayLevelIntroAnimationAsync();
+                SetState(GameState.GameOver);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to transition to state {GameState.Gameplay}. Error: {e.Message}\n{e.StackTrace}");
+            }
+        }
+
+        private async UniTaskVoid ReturnMainMenuAsync()
+        {
+            try
+            {
+                SetState(GameState.Loading);
+                await _uiManager.PlayLoadingTransitionAsync(true);
+                await _sceneLoader.LoadSceneByIndexAsync((int)SceneIndex.MainMenu);
+                await _uiManager.PlayLoadingTransitionAsync(false);
+                SetState(GameState.MainMenu);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to transition to state {GameState.MainMenu}. Error: {e.Message}\n{e.StackTrace}");
+            }
         }
 
         private async UniTaskVoid LoadLevelWorkflowAsync(int levelIndex)
         {
-            if (_currentState == GameState.Loading)
-                return;
-
             try
             {
                 SetState(GameState.Loading);
@@ -62,10 +125,6 @@ namespace Match3.Scripts.Core
             catch (System.Exception e)
             {
                 Debug.LogError($"Failed to transition to state {GameState.Gameplay}. Error: {e.Message}\n{e.StackTrace}");
-                if (_currentState != GameState.MainMenu)
-                {
-                    RequestMainMenu().Forget();
-                }
             }
         }
 
@@ -75,7 +134,16 @@ namespace Match3.Scripts.Core
                 return;
             Debug.Log($"State changing to {newState}");
             _currentState = newState;
-            _publisher.Fire(new GameStateChangedEvent(newState));
+            _eventBus.Fire(new GameStateChangedEvent(newState));
         }
+
+        private void OnLevelEnd(LevelEnd eventData)
+        {
+            var state = eventData.WasWon ? GameState.Victory : GameState.GameOver;
+            SetState(state);
+            _uiManager.ShowPopupAsync(PopupType.Result).Forget();
+        }
+
+        #endregion
     }
 }

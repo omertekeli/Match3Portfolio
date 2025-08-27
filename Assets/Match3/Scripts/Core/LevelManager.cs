@@ -11,7 +11,7 @@ using UnityCoreModules.Services;
 
 namespace Match3.Scripts.Core
 {
-    public class LevelManager : IService, ILevelManager
+    public class LevelManager : ILevelManager
     {
         #region Fields
         private readonly GameObject _boardPrefab;
@@ -20,6 +20,7 @@ namespace Match3.Scripts.Core
         private readonly IEventPublisher _publisher;
         private Board _currentBoard;
         private List<LevelGoalBase> _levelGoals;
+        private int _currentLevelIndex;
         #endregion
 
         #region Properties
@@ -34,10 +35,12 @@ namespace Match3.Scripts.Core
             _levelList = levelList;
             _sceneLoader = sceneLoader;
             _publisher = publisher;
+            _currentLevelIndex = 0;
         }
+
         public async UniTask LoadAndSetupLevelAsync(int levelIndex)
         {
-            Debug.Log($"Tryinh to load level index {levelIndex}");
+            Debug.Log($"Trying to load level index {levelIndex}");
             if (!_levelList.IsLevelValid(levelIndex))
             {
                 throw new System.ArgumentOutOfRangeException(
@@ -47,6 +50,8 @@ namespace Match3.Scripts.Core
 
             int buildIndex = _levelList.SceneBuildIndexes[levelIndex];
             await _sceneLoader.LoadSceneByIndexAsync(buildIndex);
+
+            _currentLevelIndex = levelIndex;
 
             LevelDataSO levelData = _levelList.LevelDatas[levelIndex];
             await InitializeLevelRules(levelData);
@@ -61,12 +66,22 @@ namespace Match3.Scripts.Core
             await _currentBoard.PlayIntroAnimationAsync();
         }
 
+        public async UniTask RestartLevelAsync()
+        {
+            LevelDataSO levelData = _levelList.LevelDatas[_currentLevelIndex];
+            await InitializeLevelRules(levelData);
+            _publisher.Fire(new LevelLoaded(_currentLevelIndex, levelData));
+
+            SpawnBoard(levelData);
+        }
+
         public void DecrementMove()
         {
             if (RemainingMove <= 0)
                 return;
 
             Debug.Log($" Fire new Remaning move: {RemainingMove}");
+
             RemainingMove--;
             _publisher.Fire(new MoveCountUpdated(RemainingMove));
 

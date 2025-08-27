@@ -1,16 +1,13 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Match3.Scripts.Configs;
 using Match3.Scripts.Core;
 using Match3.Scripts.Core.Events;
 using Match3.Scripts.Core.Interfaces;
 using Match3.Scripts.Systems.Board.Contents;
-using Match3.Scripts.Systems.Board.Contents.Gem;
 using Match3.Scripts.Systems.Board.Data;
 using Match3.Scripts.Systems.Board.Systems;
 using Match3.Scripts.Systems.Level.Data;
-using NUnit.Framework;
 using UnityCoreModules.Services;
 using UnityCoreModules.Services.EventBus;
 using UnityCoreModules.Services.ObjectPool;
@@ -40,6 +37,7 @@ namespace Match3.Scripts.Systems.Board
 
         #region Services
         private IPoolManager _poolManager;
+        private IAudioManager _audioManager;
         private GemSpriteProvider _gemSpriteProvider;
         #endregion
 
@@ -62,6 +60,7 @@ namespace Match3.Scripts.Systems.Board
         private void Awake()
         {
             _poolManager = ServiceLocator.Get<IPoolManager>();
+            _audioManager = ServiceLocator.Get<IAudioManager>();
             _gemSpriteProvider = ServiceLocator.Get<GemSpriteProvider>();
             _pieceFactory = new PieceFactory(_pieceFactoryConfig, _poolManager, _gemSpriteProvider);
             _boardFactory = new BoardFactory(_pieceFactory, _boardFactoryConfig);
@@ -89,7 +88,7 @@ namespace Match3.Scripts.Systems.Board
             this.Height = levelData.Height;
 
             _visualsToAnimate = _boardFactory.BuildBoard(this, levelData);
-            _moveProcessor = new MoveProcessorSystem(this, ServiceLocator.Get<IEventPublisher>(), _pieceFactory, levelData);
+            _moveProcessor = new MoveProcessorSystem(this, _audioManager, ServiceLocator.Get<IEventPublisher>(), _pieceFactory, levelData);
         }
 
         public async UniTask PlayIntroAnimationAsync()
@@ -224,6 +223,10 @@ namespace Match3.Scripts.Systems.Board
                 if (moveWasSuccessful)
                 {
                     //ServiceLocator.Get<ILevelManager>().DecrementMove();
+                }
+                else
+                {
+                   _audioManager.PlaySfx(Enums.SfxType.PieceCantMove); 
                 }
             }
         }

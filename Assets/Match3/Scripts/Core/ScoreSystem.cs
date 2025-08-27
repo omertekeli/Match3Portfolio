@@ -4,7 +4,7 @@ using Match3.Scripts.Core.Interfaces;
 using Match3.Scripts.Systems.Board.Events;
 using UnityCoreModules.Services.EventBus;
 
-public class ScoreSystem : IService, IScoreSystem
+public class ScoreSystem : IScoreSystem
 {
     #region Fields
     private readonly IEventBus _eventBus;

@@ -74,8 +74,8 @@ public class RefillSystem
                     {
                         gemGO.transform.localScale = Vector3.zero;
                         Sequence sequence = DOTween.Sequence();
-                        sequence.Join(gemGO.transform.DOScale(Vector3.one, FALL_DURATION * 1.5f).SetEase(Ease.OutBack));
-                        sequence.Join(gemGO.transform.DOMove(endPosition, FALL_DURATION * 1.5f).SetEase(Ease.OutQuad));
+                        sequence.Append(gemGO.transform.DOScale(Vector3.one, FALL_DURATION * 1f).SetEase(Ease.OutBack));
+                        sequence.Join(gemGO.transform.DOMove(endPosition, FALL_DURATION * 1f).SetEase(Ease.OutQuad));
                         animationTasks.Add(sequence.ToUniTask());
                     }
                     boardChanged = true;

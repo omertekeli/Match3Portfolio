@@ -1,10 +1,11 @@
 using System;
 using Match3.Scripts.Core;
+using Match3.Scripts.Core.Interfaces;
 using UnityCoreModules.Services;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Match3.Scripts.UI
+namespace Match3.Scripts.UI.Components
 {
     public class LevelMenu : MonoBehaviour
     {
@@ -46,6 +47,7 @@ namespace Match3.Scripts.UI
                 _levelButtons[i].onClick.AddListener(() =>
                 {
                     Debug.Log($"Level {levelIndex} button clicked");
+                    ServiceLocator.Get<IAudioManager>().PlaySfx(Enums.SfxType.ButtonClick);
                     LevelSelected?.Invoke(levelIndex);
                 });
             }

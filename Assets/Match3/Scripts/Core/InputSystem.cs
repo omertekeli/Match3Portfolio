@@ -12,7 +12,7 @@ using UnityEngine.InputSystem;
 
 namespace Match3.Scripts.Core
 {
-    public class InputSystem : IService, IInputSystem
+    public class InputSystem : IInputSystem
     {
         public event Action<SwapRequested> SwapRequested;
         private readonly IEventSubscriber _subscriber;
@@ -88,11 +88,6 @@ namespace Match3.Scripts.Core
             {
                 return delta.y > 0 ? Direction.Up : Direction.Down;
             }
-        }
-
-        private bool IsAdjacent(TileNode from, TileNode to)
-        {
-            return from.Neighbors.ContainsValue(to);
         }
 
     }

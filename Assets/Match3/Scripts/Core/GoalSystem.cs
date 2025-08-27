@@ -13,16 +13,14 @@ namespace Match3.Scripts.Core
     public class GoalSystem : IService
     {
         #region Fields
-        private readonly IEventSubscriber _subscriber;
-        private readonly IEventPublisher _publisher;
+        private readonly IEventBus _eventBus;
         private List<LevelGoalBase> _activeGoals;
         #endregion
 
-        public GoalSystem()
+        public GoalSystem(IEventBus eventBus)
         {
-            _subscriber = ServiceLocator.Get<IEventSubscriber>();
-            _publisher = ServiceLocator.Get<IEventPublisher>();
-            _subscriber.Subscribe<PiecesCleared>(OnPiecesCleared);
+            _eventBus = eventBus;
+            _eventBus.Subscribe<PiecesCleared>(OnPiecesCleared);
         }
 
         #region Methods
@@ -38,7 +36,7 @@ namespace Match3.Scripts.Core
 
         public void Shutdown()
         {
-            _subscriber.Unsubscribe<PiecesCleared>(OnPiecesCleared);
+            _eventBus.Unsubscribe<PiecesCleared>(OnPiecesCleared);
         }
 
         private void OnPiecesCleared(PiecesCleared eventData)
@@ -64,12 +62,12 @@ namespace Match3.Scripts.Core
             if (wasGoalUpdated)
             {
                 float totalProgress = CalculateTotalProgress();
-                _publisher.Fire(new GoalUpdated(totalProgress));
+                _eventBus.Fire(new GoalUpdated(totalProgress));
             }
 
             if (IsAllGoalsCompleted())
             {
-                _publisher.Fire(new LevelEnd(true));
+                _eventBus.Fire(new LevelEnd(true));
                 Debug.Log("LEVEL WON!");
             }
         }

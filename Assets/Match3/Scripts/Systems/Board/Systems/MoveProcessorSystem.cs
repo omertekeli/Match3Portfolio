@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Match3.Scripts.Core.Interfaces;
 using Match3.Scripts.Enums;
 using Match3.Scripts.Systems.Board.Contents;
 using Match3.Scripts.Systems.Board.Contents.Gem;
@@ -17,14 +18,16 @@ namespace Match3.Scripts.Systems.Board.Systems
         #region Fields
         private readonly Board _board;
         private readonly IEventPublisher _publisher;
+        private readonly IAudioManager _audioManager;
         private readonly MatchFindingSystem _matchFinder;
         private readonly RefillSystem _refillSystem;
         #endregion
 
-        public MoveProcessorSystem(Board board, IEventPublisher publisher, IPieceFactory pieceFactory, LevelDataSO levelData)
+        public MoveProcessorSystem(Board board, IAudioManager audioManager, IEventPublisher publisher, IPieceFactory pieceFactory, LevelDataSO levelData)
         {
             _board = board;
             _publisher = publisher;
+            _audioManager = audioManager;
             _matchFinder = new MatchFindingSystem(board);
             _refillSystem = new RefillSystem(board, pieceFactory, levelData);
         }
@@ -54,7 +57,8 @@ namespace Match3.Scripts.Systems.Board.Systems
             while (true)
             {
                 var matches = _matchFinder.FindAllMatches();
-                if (matches.Count == 0) break;
+                if (matches.Count == 0)
+                    break;
 
                 matchFoundInLoop = true;
 
@@ -91,6 +95,7 @@ namespace Match3.Scripts.Systems.Board.Systems
                     Debug.Log($"Clear at position: {node.Content.Node.GridPosition}");
                     _board.UnregisterView(node.Content);
                     node.UpdateContent(null);
+                    _audioManager.PlaySfx(Enums.SfxType.PieceMatch);
                 }
             }
 

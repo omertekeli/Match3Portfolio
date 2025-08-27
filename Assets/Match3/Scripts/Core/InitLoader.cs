@@ -56,6 +56,7 @@ namespace Match3.Scripts.Core
         private void RegisterPOCOServices()
         {
             var eventBus = new EventBus();
+            ServiceLocator.Register<IEventBus>(eventBus);
             ServiceLocator.Register<IEventPublisher>(eventBus);
             ServiceLocator.Register<IEventSubscriber>(eventBus);
 
@@ -79,7 +80,7 @@ namespace Match3.Scripts.Core
             );
             ServiceLocator.Register<ILevelManager>(levelManager);
 
-            var goalSystem = new GoalSystem();
+            var goalSystem = new GoalSystem(eventBus);
             ServiceLocator.Register<GoalSystem>(goalSystem);
 
             var scoreSystem = new ScoreSystem(eventBus);
@@ -88,15 +89,36 @@ namespace Match3.Scripts.Core
 
         private void RegisterMonoServices()
         {
+            var registerMethod = typeof(ServiceLocator).GetMethod("Register");
+
             foreach (var mb in _monoServices)
             {
-                if (!mb || !mb.enabled || mb is not IService service) continue;
-                var type = service.GetType();
-                Debug.Log($"Registering service '{type.Name}'");
-                typeof(ServiceLocator)
-                    .GetMethod("Register")
-                    ?.MakeGenericMethod(type)
-                    .Invoke(null, new object[] { service, false });
+                if (!mb || !mb.enabled || mb is not IService service)
+                    continue;
+
+                var concreteType = service.GetType();
+                var interfaces = concreteType.GetInterfaces();
+
+                bool wasRegistered = false;
+                foreach (var interfaceType in interfaces)
+                {
+                    if (typeof(IService).IsAssignableFrom(interfaceType) && interfaceType != typeof(IService))
+                    {
+                        Debug.Log($"Registering service '{concreteType.Name}' as interface '{interfaceType.Name}'");
+
+                        registerMethod?.MakeGenericMethod(interfaceType)
+                                      .Invoke(null, new object[] { service, false });
+
+                        wasRegistered = true;
+                    }
+                }
+
+                if (!wasRegistered)
+                {
+                    registerMethod?.MakeGenericMethod(concreteType)
+                                .Invoke(null, new object[] { service, false });
+                    Debug.LogWarning($"Service '{concreteType.Name}' implements IService but has no specific service interface (e.g., IAudioManager). It will not be accessible via ServiceLocator.");
+                }
             }
         }
     }

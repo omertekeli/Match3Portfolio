@@ -4,13 +4,14 @@ using System.Collections.Generic;
 
 namespace Match3.Scripts.Core.Interfaces
 {
-    public interface ILevelManager
+    public interface ILevelManager: IService
     {
         int RemainingMove { get; }
         IReadOnlyList<LevelGoalBase> LevelGoals { get; }
 
         UniTask PlayLevelIntroAnimationAsync();
         UniTask LoadAndSetupLevelAsync(int levelIndex);
+        UniTask RestartLevelAsync();
         void DecrementMove();
     }
 }

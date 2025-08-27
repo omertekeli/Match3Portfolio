@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace Match3.Scripts.Core
 {
-    public class SceneLoader : IService, ISceneLoader
+    public class SceneLoader : ISceneLoader
     {
         public SceneLoader() { }
 

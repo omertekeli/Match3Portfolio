@@ -1,6 +1,6 @@
 namespace Match3.Scripts.Core.Interfaces
 {
-    public interface IScoreSystem
+    public interface IScoreSystem : IService
     {
         int CurrentScore { get; }
         void Initialize();
