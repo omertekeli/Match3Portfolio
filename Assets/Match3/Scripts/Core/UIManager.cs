@@ -73,9 +73,14 @@ namespace Match3.Scripts.Core
             Debug.Log($"Level count: {levelCount}");
             menu.ConfigureButtons(levelCount);
             menu.LevelSelected += OnLevelSelection;
+            menu.QuitClicked += OnQuitClicked;
         }
 
-        public void UnregisterLevelMenu(LevelMenu menu) => menu.LevelSelected -= OnLevelSelection;
+        public void UnregisterLevelMenu(LevelMenu menu)
+        {
+            menu.LevelSelected -= OnLevelSelection;
+            menu.QuitClicked -= OnQuitClicked;
+        }
 
         public void SetupLevelUI(LevelDataSO levelData)
         {
@@ -243,6 +248,11 @@ namespace Match3.Scripts.Core
         {
             Debug.Log($"Update Score: {eventData.CurrentScore}");
             _hudController.UpdateScore(eventData.CurrentScore);
+        }
+
+        private void OnQuitClicked()
+        {
+            Application.Quit();
         }
         #endregion
     }

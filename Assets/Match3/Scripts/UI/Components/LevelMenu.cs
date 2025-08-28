@@ -12,12 +12,14 @@ namespace Match3.Scripts.UI.Components
         #region Fields
 
         [SerializeField] private Button[] _levelButtons;
+        [SerializeField] private Button _quitButton;
 
         #endregion
 
         #region Events
 
         public event Action<int> LevelSelected;
+        public event Action QuitClicked;
 
         #endregion
 
@@ -66,6 +68,8 @@ namespace Match3.Scripts.UI.Components
                     LevelSelected?.Invoke(levelIndex);
                 });
             }
+
+            _quitButton.onClick.AddListener(() => QuitClicked?.Invoke());
         }
     }
 }
