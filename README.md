@@ -19,16 +19,17 @@ The project’s goal is to demonstrate modern Unity development practices, modul
 - Data-driven tile and level configuration using ScriptableObjects.
 - Modular architecture with clear separation of concerns.
 - Event-driven system for UI, score, audio, and game logic communication.
-- Simple state machine for game flow (start, playing, animation, game over).
-- Responsive and mobile-friendly UI (Canvas scaling, Safe Area, etc.).
-- Basic sound effects and UI animations.
+- Simple state machine for game flow (start, playing, animation, game over)..
 - Clean and readable codebase, commented and ready for further extension.
+- Managing prefabs with object pooling
+
+### 🔧 Custom Editor Tool
+![Match3 Gameplay Demo](https://github.com/omertekeli/Match3Portfolio/blob/a7207101ccc48776ef2edffde8bd5756ec872d9b/Animation_5.gif)
+
 
 ## ✨ Extensibility & Future Work
 - Special tiles (chained, frozen, locked, etc.)
 - Boosters (bomb, rocket, disco ball, etc.)
-- Multiple game modes and progression
 - Online leaderboards and user profiles (Firebase)
-- Advanced visual effects (shader-based, addressables, etc.)
 
 **This project is published solely for demonstration and portfolio purposes.**
