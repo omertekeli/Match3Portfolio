@@ -71,6 +71,7 @@ namespace Match3.Scripts.Core
                 return;
             ReturnMainMenuAsync().Forget();
         }
+        
 
         private async UniTaskVoid Init()
         {
@@ -101,6 +102,7 @@ namespace Match3.Scripts.Core
             {
                 SetState(GameState.Loading);
                 await _uiManager.PlayLoadingTransitionAsync(true);
+                _levelManager.ReorganizePools();
                 await _sceneLoader.LoadSceneByIndexAsync((int)SceneIndex.MainMenu);
                 await _uiManager.PlayLoadingTransitionAsync(false);
                 SetState(GameState.MainMenu);

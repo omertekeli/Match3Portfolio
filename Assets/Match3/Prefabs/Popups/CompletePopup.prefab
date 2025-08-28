@@ -624,7 +624,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: COMPLETE!
+  m_text: 'WON!
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 97f6aad9d3e863e4aa924411fd8e1c25, type: 2}
   m_sharedMaterial: {fileID: -5263338218149616523, guid: 97f6aad9d3e863e4aa924411fd8e1c25, type: 2}
@@ -836,6 +838,7 @@ MonoBehaviour:
   _replayButton: {fileID: 8900309008818855255}
   _menuButton: {fileID: 8312225114919870310}
   _scoreText: {fileID: 1059221449863207308}
+  _resultText: {fileID: 1059221449292732720}
 --- !u!1 &1059221449665571163
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,6 +13,7 @@ namespace Match3.Scripts.UI.Components
         [SerializeField] private Button _replayButton;
         [SerializeField] private Button _menuButton;
         [SerializeField] private TextMeshProUGUI _scoreText;
+        [SerializeField] private TextMeshProUGUI _resultText;
         #endregion
 
         #region Properties
@@ -30,9 +31,10 @@ namespace Match3.Scripts.UI.Components
             _menuButton.onClick.AddListener(() => ActionRequested?.Invoke(PopupActionType.MainMenu));
         }
 
-        public void Setup(int score)
+        public void Setup(int score, string result)
         {
             _scoreText.text = score.ToString();
+            _resultText.text = result;
             Debug.Log("Result Popup is ready");
         }
     }

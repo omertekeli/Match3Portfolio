@@ -175,6 +175,19 @@ namespace Match3.Scripts.Systems.Board
             }
             return localPos;
         }
+
+        public void ReturnAllPiecesToPool()
+        {
+            if (_poolManager != null && _viewMap != null)
+            {
+                var viewsToReturn = new List<PieceView>(_viewMap.Values);
+                foreach (var view in viewsToReturn)
+                {
+                    _poolManager.Return(view.gameObject);
+                }
+                _viewMap.Clear();
+            }
+        }
         #endregion
 
         #region Private Methods
@@ -195,11 +208,12 @@ namespace Match3.Scripts.Systems.Board
 
         private void CleanupBoard()
         {
-            foreach (var container in _boardFactoryConfig.CleanableContainers)
+            ReturnAllPiecesToPool();
+            if (_boardFactoryConfig.BackgroundContainer != null)
             {
-                foreach (var item in container)
+                for (int i = _boardFactoryConfig.BackgroundContainer.childCount - 1; i >= 0; i--)
                 {
-                    Destroy(container.gameObject);
+                    Destroy(_boardFactoryConfig.BackgroundContainer.GetChild(i).gameObject);
                 }
             }
         }
@@ -226,7 +240,7 @@ namespace Match3.Scripts.Systems.Board
                 }
                 else
                 {
-                   _audioManager.PlaySfx(Enums.SfxType.PieceCantMove); 
+                    _audioManager.PlaySfx(Enums.SfxType.PieceCantMove);
                 }
             }
         }

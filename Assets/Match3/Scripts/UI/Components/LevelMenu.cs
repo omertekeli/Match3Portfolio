@@ -38,6 +38,21 @@ namespace Match3.Scripts.UI.Components
             }
         }
 
+        public void ConfigureButtons(int totalAvailableLevels)
+        {
+            for (int i = 0; i < _levelButtons.Length; i++)
+            {
+                if (i < totalAvailableLevels)
+                {
+                    _levelButtons[i].gameObject.transform.parent.gameObject.SetActive(true);
+                }
+                else
+                {
+                    _levelButtons[i].gameObject.transform.parent.gameObject.SetActive(false);
+                }
+            }
+        }
+
         private void Setup()
         {
             for (int i = 0; i < _levelButtons.Length; i++)

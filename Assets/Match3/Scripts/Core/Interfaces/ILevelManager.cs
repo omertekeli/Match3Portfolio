@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Match3.Scripts.Core.Interfaces
 {
-    public interface ILevelManager: IService
+    public interface ILevelManager : IService
     {
         int RemainingMove { get; }
         IReadOnlyList<LevelGoalBase> LevelGoals { get; }
@@ -13,5 +13,7 @@ namespace Match3.Scripts.Core.Interfaces
         UniTask LoadAndSetupLevelAsync(int levelIndex);
         UniTask RestartLevelAsync();
         void DecrementMove();
+        void ReorganizePools();
+        int GetLevelCount();
     }
 }

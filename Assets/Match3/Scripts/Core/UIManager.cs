@@ -67,7 +67,13 @@ namespace Match3.Scripts.Core
             _subscriber.Unsubscribe<ScoreUpdated>(OnScoreUpdated);
         }
 
-        public void RegisterLevelMenu(LevelMenu menu) => menu.LevelSelected += OnLevelSelection;
+        public void RegisterLevelMenu(LevelMenu menu)
+        {
+            int levelCount = ServiceLocator.Get<ILevelManager>().GetLevelCount();
+            Debug.Log($"Level count: {levelCount}");
+            menu.ConfigureButtons(levelCount);
+            menu.LevelSelected += OnLevelSelection;
+        }
 
         public void UnregisterLevelMenu(LevelMenu menu) => menu.LevelSelected -= OnLevelSelection;
 
@@ -81,6 +87,7 @@ namespace Match3.Scripts.Core
             if (isShowingLoadingScreen)
             {
                 await _fadeController.FadeToBlackAsync();
+                _hudController.ToggleHUD(false);
             }
             else
             {
@@ -159,7 +166,10 @@ namespace Match3.Scripts.Core
             if (_currentPopup is not ResultPopup resultPopup)
                 return;
 
-            resultPopup.Setup(ServiceLocator.Get<IScoreSystem>().CurrentScore);
+            resultPopup.Setup(
+                ServiceLocator.Get<IScoreSystem>().CurrentScore,
+                ServiceLocator.Get<GameManager>().GameState.ToString()
+            );
             resultPopup.ActionRequested += HandlePopupAction;
         }
 
@@ -201,9 +211,8 @@ namespace Match3.Scripts.Core
                     break;
 
                 case PopupActionType.MainMenu:
-                    HideCurrentPopupAsync().Forget();
                     ServiceLocator.Get<GameManager>().RequestReturnMainMenu();
-                    _hudController.ToggleHUD(false);
+                    HideCurrentPopupAsync().Forget();
                     break;
 
                 case PopupActionType.Quit:

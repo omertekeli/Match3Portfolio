@@ -92,6 +92,18 @@ namespace Match3.Scripts.Core
             }
         }
 
+        public void ReorganizePools()
+        {
+            if (_currentBoard == null)
+                return;
+            _currentBoard.ReturnAllPiecesToPool();
+        }
+
+        public int GetLevelCount()
+        {
+            return _levelList.SceneCount;
+        }
+
         private void SpawnBoard(LevelDataSO levelData)
         {
             if (_currentBoard != null)

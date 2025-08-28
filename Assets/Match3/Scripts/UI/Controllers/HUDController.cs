@@ -34,6 +34,7 @@ namespace Match3.Scripts.UI.Controllers
         {
             UpdateRemainingMove(leveldata.MaxMove);
             UpdateScore(0);
+            UpdateProgressBar(0);
             _goalPanelController.SetupGoals(goals);
         }
 
