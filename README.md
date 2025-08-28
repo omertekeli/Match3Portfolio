@@ -1,8 +1,11 @@
-# Match3Portfolio
+# Fruity Bat
+
+## 🎮 Let's Play
+[Fruity Bat - Play on itch.io](https://berckhart.itch.io/fruity-bat)
 
 ## 🎯 Project Overview
 
-**Match3Portfolio** is a modular, cleanly-architected Match-3 puzzle game developed in Unity as a professional portfolio project.  
+**Fruity Bat** is a modular, cleanly-architected Match-3 puzzle game developed in Unity as a professional portfolio project.  
 The project’s goal is to demonstrate modern Unity development practices, modular game architecture, and a scalable codebase with extensibility in mind.
 
 ![Match3 Gameplay Demo](https://github.com/omertekeli/Match3Portfolio/blob/1fb6e3aad7ac7387f8c18f2e5324f9c0558313fc/Animation_6.gif)
