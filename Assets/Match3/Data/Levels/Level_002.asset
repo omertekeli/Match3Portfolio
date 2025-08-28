@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _levelNumber: 2
   _maxMove: 15
-  _availablePieceTypes: 00000000
+  _availablePieceTypes: 000000000100000002000000
   _width: 7
-  _height: 7
+  _height: 8
   _tileSetups:
   - groundType: 1
     contentType: 0
@@ -24,42 +24,6 @@ MonoBehaviour:
     powerData: {fileID: 0}
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
-  - groundType: 2
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 2
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 2
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 2
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 2
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 1
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
   - groundType: 0
     contentType: 0
     gemType: 0
@@ -85,84 +49,6 @@ MonoBehaviour:
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
   - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 0
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 1
-    contentType: 0
-    gemType: 0
-    powerData: {fileID: 0}
-    contentObstacleData: {fileID: 0}
-    overlayObstacleData: {fileID: 0}
-  - groundType: 1
     contentType: 0
     gemType: 0
     powerData: {fileID: 0}
@@ -276,6 +162,78 @@ MonoBehaviour:
     powerData: {fileID: 0}
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
   - groundType: 0
     contentType: 0
     gemType: 0
@@ -301,6 +259,90 @@ MonoBehaviour:
     contentObstacleData: {fileID: 0}
     overlayObstacleData: {fileID: 0}
   - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 0
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 1
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
+    contentType: 0
+    gemType: 0
+    powerData: {fileID: 0}
+    contentObstacleData: {fileID: 0}
+    overlayObstacleData: {fileID: 0}
+  - groundType: 2
     contentType: 0
     gemType: 0
     powerData: {fileID: 0}
